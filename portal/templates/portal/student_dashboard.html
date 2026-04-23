@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | CareerFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --han-purple: #5218FA;
+            --kobi: #E79FC4;
+            --maximum-yellow: #FAEF32;
+            --middle-blue: #7ED4E6;
+            --ruby: #E0115F;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FB; /* Extremely subtle contrast for main content area */
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light); /* Makes the white cards pop */
+            color: #2d3436;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            background-color: var(--white);
+            min-height: 100vh;
+            border-right: 2px solid rgba(126, 212, 230, 0.2); /* Subtle Middle Blue */
+            padding-top: 20px;
+        }
+        .sidebar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--han-purple);
+            text-decoration: none;
+            padding: 0 20px;
+            display: block;
+            margin-bottom: 30px;
+        }
+        .sidebar-brand span { color: var(--ruby); }
+        
+        .nav-link {
+            color: #6c757d;
+            font-weight: 500;
+            padding: 12px 25px;
+            margin: 5px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            color: var(--han-purple);
+            background-color: rgba(82, 24, 250, 0.05);
+        }
+        .nav-link.active {
+            background-color: var(--han-purple);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(82, 24, 250, 0.3);
+        }
+
+        /* --- Dashboard Cards --- */
+        .card {
+            border: none;
+            background-color: var(--white);
+            border-radius: 16px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+        
+        /* Metric Cards */
+        .metric-card {
+            padding: 20px;
+            border-radius: 16px;
+            background-color: var(--white);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border-bottom: 4px solid var(--han-purple);
+            transition: transform 0.2s;
+        }
+        .metric-card:hover { transform: translateY(-5px); }
+        .metric-card.card-blue { border-bottom-color: var(--middle-blue); }
+        .metric-card.card-kobi { border-bottom-color: var(--kobi); }
+        
+        .metric-card .lbl {
+            font-size: 13px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+        .metric-card .val {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--han-purple);
+            margin-top: 5px;
+        }
+
+        /* --- Notifications --- */
+        .notif-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--ruby);
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(224, 17, 95, 0.4);
+        }
+
+        /* --- Visual Pipeline --- */
+        .job-card {
+            border: 1px solid rgba(126, 212, 230, 0.3);
+            transition: all 0.3s;
+        }
+        .job-card:hover {
+            border-color: var(--han-purple);
+            box-shadow: 0 5px 15px rgba(82, 24, 250, 0.08);
+        }
+        
+        .badge-stage {
+            background-color: var(--middle-blue);
+            color: #1a4f5c;
+            font-weight: 600;
+        }
+
+        .pipeline-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 20px 0;
+            padding: 0 10px;
+        }
+        .pipeline-container::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            right: 20px;
+            height: 3px;
+            background-color: #e9ecef;
+            z-index: 1;
+        }
+        .pipeline-step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: white;
+            line-height: 28px;
+            font-size: 12px;
+            margin: 0 auto;
+            border: 4px solid var(--white);
+            transition: 0.3s;
+        }
+        .step-label {
+            font-size: 11px;
+            color: #adb5bd;
+            font-weight: 600;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+        
+        /* Pipeline Active States */
+        .pipeline-step.completed .step-circle {
+            background-color: var(--middle-blue);
+        }
+        .pipeline-step.completed .step-label {
+            color: var(--middle-blue);
+        }
+        .pipeline-step.current .step-circle {
+            background-color: var(--han-purple);
+            box-shadow: 0 0 0 3px rgba(82, 24, 250, 0.2);
+        }
+        .pipeline-step.current .step-label {
+            color: var(--han-purple);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
+    <a href="{% url 'home' %}" class="sidebar-brand">
+        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
+    </a>
+    
+    <div class="d-flex flex-column">
+        <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Student Portal</div>
+        
+        <a href="{% url 'student_dashboard' %}" class="nav-link active">
+            <i class="fas fa-th-large me-2"></i> Dashboard
+        </a>
+        
+        <a href="{% url 'student_profile' %}" class="nav-link">
+            <i class="fas fa-user me-2"></i> My Profile
+        </a>
+        
+        <a href="{% url 'drives_list' %}" class="nav-link">
+            <i class="fas fa-briefcase me-2"></i> Browse Drives
+        </a>
+        
+        <a href="{% url 'my_status' %}" class="nav-link">
+            <i class="fas fa-clipboard-check me-2"></i> My Status
+        </a>
+        
+        <hr class="mx-3 my-4 opacity-25">
+        
+        <a href="{% url 'login' %}" class="nav-link text-danger">
+            <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </a>
+    </div>
+</div>
+
+        <div class="col-md-9 col-lg-10 p-4 p-md-5">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-0 text-dark">Welcome back, Alex!</h3>
+                    <p class="text-muted small">Here is your placement overview for the 2026 session.</p>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="lbl">Eligible Drives</div>
+                        <div class="val">14</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card card-blue">
+                        <div class="lbl">Applications</div>
+                        <div class="val" style="color: var(--middle-blue)">3</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card card-kobi">
+                        <div class="lbl">Current GPA</div>
+                        <div class="val" style="color: var(--kobi)">8.75</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card p-4">
+                        <h6 class="fw-bold mb-4 text-dark"><i class="fas fa-layer-group me-2" style="color: var(--han-purple)"></i> My Applications</h6>
+                        
+                        <div class="job-card bg-white rounded-4 p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <h5 class="mb-0 fw-bold">Microsoft <span class="fw-normal text-muted" style="font-size:16px;">— Software Engineer</span></h5>
+                                </div>
+                                <span class="badge badge-stage rounded-pill px-3 py-2">Technical Round</span>
+                            </div>
+                            
+                            <div class="pipeline-container">
+                                <div class="pipeline-step completed">
+                                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                                    <div class="step-label">Applied</div>
+                                </div>
+                                <div class="pipeline-step completed">
+                                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                                    <div class="step-label">Written</div>
+                                </div>
+                                <div class="pipeline-step current">
+                                    <div class="step-circle"><i class="fas fa-code"></i></div>
+                                    <div class="step-label">Technical</div>
+                                </div>
+                                <div class="pipeline-step">
+                                    <div class="step-circle"></div>
+                                    <div class="step-label">HR</div>
+                                </div>
+                                <div class="pipeline-step">
+                                    <div class="step-circle"></div>
+                                    <div class="step-label">Placed</div>
+                                </div>
+                            </div>
+                            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i> Applied 12 Apr 2026</small>
+                        </div>
+
+                        <div class="job-card bg-white rounded-4 p-3 mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <h5 class="mb-0 fw-bold">Amazon <span class="fw-normal text-muted" style="font-size:16px;">— Frontend Dev</span></h5>
+                                </div>
+                                <span class="badge rounded-pill px-3 py-2" style="background-color: rgba(224, 17, 95, 0.1); color: var(--ruby);">Rejected</span>
+                            </div>
+                            
+                            <div class="pipeline-container">
+                                <div class="pipeline-step completed">
+                                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                                    <div class="step-label">Applied</div>
+                                </div>
+                                <div class="pipeline-step completed" style="filter: grayscale(100%);">
+                                    <div class="step-circle" style="background-color: var(--ruby);"><i class="fas fa-times"></i></div>
+                                    <div class="step-label" style="color: var(--ruby);">Written</div>
+                                </div>
+                                <div class="pipeline-step">
+                                    <div class="step-circle"></div>
+                                    <div class="step-label">Technical</div>
+                                </div>
+                                <div class="pipeline-step">
+                                    <div class="step-circle"></div>
+                                    <div class="step-label">HR</div>
+                                </div>
+                                <div class="pipeline-step">
+                                    <div class="step-circle"></div>
+                                    <div class="step-label">Placed</div>
+                                </div>
+                            </div>
+                            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i> Applied 05 Apr 2026</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-bell me-2" style="color: var(--maximum-yellow)"></i> Notifications</h6>
+                        </div>
+                        
+                        <div class="d-flex gap-3 py-3 border-bottom">
+                            <div class="notif-dot"></div>
+                            <div>
+                                <div style="font-size:14px; font-weight:500;">Google has posted a new drive for SDE-1.</div>
+                                <small class="text-muted">2 hours ago</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-3 py-3 border-bottom">
+                            <div class="notif-dot" style="background-color: var(--kobi); box-shadow: 0 0 8px rgba(231, 159, 196, 0.4);"></div>
+                            <div>
+                                <div style="font-size:14px; font-weight:500;">Your resume for TCS Ninja was shortlisted!</div>
+                                <small class="text-muted">1 day ago</small>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <button class="btn btn-sm btn-outline-dark rounded-pill px-4">Mark all as read</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

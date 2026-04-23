@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Drives | CareerFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --han-purple: #5218FA;
+            --kobi: #E79FC4;
+            --maximum-yellow: #FAEF32;
+            --middle-blue: #7ED4E6;
+            --ruby: #E0115F;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FB; 
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-light);
+            color: #2d3436;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            background-color: var(--white);
+            min-height: 100vh;
+            border-right: 2px solid rgba(126, 212, 230, 0.2);
+            padding-top: 20px;
+        }
+        .sidebar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--han-purple);
+            text-decoration: none;
+            padding: 0 20px;
+            display: block;
+            margin-bottom: 30px;
+        }
+        .sidebar-brand span { color: var(--ruby); }
+        
+        .nav-link {
+            color: #6c757d;
+            font-weight: 500;
+            padding: 12px 25px;
+            margin: 5px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            color: var(--han-purple);
+            background-color: rgba(82, 24, 250, 0.05);
+        }
+        .nav-link.active {
+            background-color: var(--han-purple);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(82, 24, 250, 0.3);
+        }
+
+        /* --- General UI & Cards --- */
+        .card {
+            background-color: var(--white);
+            border-radius: 16px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: none;
+        }
+
+        /* --- Drive List Rows --- */
+        .drive-row {
+            transition: background-color 0.3s ease;
+        }
+        .drive-row:hover {
+            background-color: #fcfcfd;
+        }
+        .drive-row:last-child {
+            border-bottom: none !important;
+        }
+
+        .company-name {
+            font-size: 1.2rem;
+            color: var(--han-purple);
+        }
+
+        .lpa-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #2d3436;
+        }
+
+        /* --- Badges & Buttons --- */
+        .badge-eligible {
+            background-color: rgba(126, 212, 230, 0.15);
+            color: #0e8a9f; /* Darker Middle Blue for text readability */
+            border: 1px solid var(--middle-blue);
+        }
+        .badge-not-eligible {
+            background-color: #f1f3f5;
+            color: #868e96;
+            border: 1px solid #dee2e6;
+        }
+        .badge-applied {
+            background-color: var(--ruby);
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(224, 17, 95, 0.3);
+        }
+
+        .btn-primary {
+            background-color: var(--han-purple);
+            border: none;
+            padding: 8px 24px;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: var(--ruby);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(224, 17, 95, 0.3);
+        }
+        
+        .btn-disabled {
+            background-color: #e9ecef;
+            color: #adb5bd;
+            border: none;
+            padding: 8px 24px;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
+    <a href="{% url 'home' %}" class="sidebar-brand">
+        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
+    </a>
+    
+    <div class="d-flex flex-column">
+        <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Student Portal</div>
+        
+        <a href="{% url 'student_dashboard' %}" class="nav-link">
+            <i class="fas fa-th-large me-2"></i> Dashboard
+        </a>
+        
+        <a href="{% url 'student_profile' %}" class="nav-link">
+            <i class="fas fa-user me-2"></i> My Profile
+        </a>
+        
+        <a href="{% url 'drives_list' %}" class="nav-link active">
+            <i class="fas fa-briefcase me-2"></i> Browse Drives
+        </a>
+        
+        <a href="{% url 'my_status' %}" class="nav-link">
+            <i class="fas fa-clipboard-check me-2"></i> My Status
+        </a>
+        
+        <hr class="mx-3 my-4 opacity-25">
+        
+        <a href="{% url 'login' %}" class="nav-link text-danger">
+            <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </a>
+    </div>
+</div>
+
+        <div class="col-md-9 col-lg-10 p-4 p-md-5">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0 text-dark">Available Opportunities</h3>
+                
+                <div class="input-group" style="max-width: 300px;">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 rounded-end-pill" placeholder="Search companies or roles..." style="box-shadow: none;">
+                </div>
+            </div>
+
+            <div class="card border-top border-5" style="border-top-color: var(--maximum-yellow) !important;">
+                <div class="card-body p-0">
+                    
+                    <div class="drive-row d-flex flex-column flex-md-row align-items-md-center justify-content-between p-4 border-bottom">
+                        <div class="mb-3 mb-md-0">
+                            <div class="fw-bold company-name mb-1">Google <span class="text-muted fw-normal" style="font-size:16px;">— Software Engineer (SDE-1)</span></div>
+                            <div class="text-muted small">
+                                <span class="me-3"><i class="fas fa-code-branch me-1" style="color: var(--kobi)"></i> CSE, ISE</span>
+                                <span class="me-3"><i class="fas fa-graduation-cap me-1" style="color: var(--middle-blue)"></i> Min GPA: 8.0</span>
+                                <span><i class="far fa-clock me-1" style="color: var(--ruby)"></i> Deadline: 30 May 2026</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="text-end d-none d-sm-block">
+                                <div class="lpa-text">32.0 LPA</div>
+                                <span class="badge badge-eligible rounded-pill px-3 py-1">Eligible</span>
+                            </div>
+                            <button class="btn btn-primary px-4">Apply Now</button>
+                        </div>
+                    </div>
+
+                    <div class="drive-row d-flex flex-column flex-md-row align-items-md-center justify-content-between p-4 border-bottom">
+                        <div class="mb-3 mb-md-0">
+                            <div class="fw-bold company-name mb-1">Microsoft <span class="text-muted fw-normal" style="font-size:16px;">— Cloud Solutions Architect</span></div>
+                            <div class="text-muted small">
+                                <span class="me-3"><i class="fas fa-code-branch me-1" style="color: var(--kobi)"></i> All Branches</span>
+                                <span class="me-3"><i class="fas fa-graduation-cap me-1" style="color: var(--middle-blue)"></i> Min GPA: 7.5</span>
+                                <span><i class="far fa-clock me-1" style="color: var(--ruby)"></i> Deadline: 25 May 2026</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="text-end d-none d-sm-block">
+                                <div class="lpa-text">45.0 LPA</div>
+                                <span class="badge badge-eligible rounded-pill px-3 py-1">Eligible</span>
+                            </div>
+                            <div style="min-width: 110px;" class="text-center">
+                                <span class="badge badge-applied rounded-pill px-4 py-2 fs-6"><i class="fas fa-check-circle me-1"></i> Applied</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="drive-row d-flex flex-column flex-md-row align-items-md-center justify-content-between p-4 border-bottom">
+                        <div class="mb-3 mb-md-0">
+                            <div class="fw-bold company-name mb-1" style="color: #6c757d;">Goldman Sachs <span class="text-muted fw-normal" style="font-size:16px;">— Quantitative Analyst</span></div>
+                            <div class="text-muted small">
+                                <span class="me-3"><i class="fas fa-code-branch me-1" style="color: var(--kobi)"></i> CSE Only</span>
+                                <span class="me-3"><i class="fas fa-graduation-cap me-1" style="color: var(--middle-blue)"></i> Min GPA: 9.5</span>
+                                <span><i class="far fa-clock me-1" style="color: var(--ruby)"></i> Deadline: 10 May 2026</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="text-end d-none d-sm-block">
+                                <div class="lpa-text text-muted">24.0 LPA</div>
+                                <span class="badge badge-not-eligible rounded-pill px-3 py-1">Not Eligible</span>
+                            </div>
+                            <button class="btn btn-disabled px-4" disabled>Apply Now</button>
+                        </div>
+                    </div>
+
+                    </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
