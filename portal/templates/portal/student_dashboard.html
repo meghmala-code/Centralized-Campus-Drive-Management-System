@@ -213,144 +213,114 @@
         
         <hr class="mx-3 my-4 opacity-25">
         
-        <a href="{% url 'login' %}" class="nav-link text-danger">
+        <a href="{% url 'logout' %}" class="nav-link text-danger">
             <i class="fas fa-sign-out-alt me-2"></i> Logout
         </a>
     </div>
 </div>
 
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h3 class="fw-bold mb-0 text-dark">Welcome back, Alex!</h3>
-                    <p class="text-muted small">Here is your placement overview for the 2026 session.</p>
+        <div class="col-md-9 col-lg-10 p-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0" style="color: var(--midnight-blue);">Welcome back, {{ request.user.first_name }}!</h2>
+            <p class="text-muted">
+                {% if request.user.studentprofile.branch %}
+                    {{ request.user.studentprofile.branch }} | Class of {{ request.user.studentprofile.year_of_passing }}
+                {% else %}
+                    <span class="text-danger"><i class="fas fa-exclamation-circle me-1"></i> Profile Incomplete</span>
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'student_profile' %}" class="btn text-white fw-bold shadow-sm" style="background-color: var(--han-purple);">
+            <i class="fas fa-user-edit me-2"></i> Update Profile
+        </a>
+    </div>
+
+    {% if not profile.resume %}
+    <div class="alert alert-warning border-0 shadow-sm mb-4">
+        <i class="fas fa-file-upload me-2"></i> <strong>Resume Missing!</strong> You cannot apply to any campus drives until you upload your resume in your profile.
+    </div>
+    {% endif %}
+
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 5px solid var(--han-purple);">
+                <div class="card-body">
+                    <h6 class="text-muted fw-bold text-uppercase mb-2">Total Applied</h6>
+                    <h2 class="display-5 fw-bold text-dark mb-0">{{ total_applied|default:"0" }}</h2>
                 </div>
             </div>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-4">
-                    <div class="metric-card">
-                        <div class="lbl">Eligible Drives</div>
-                        <div class="val">14</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="metric-card card-blue">
-                        <div class="lbl">Applications</div>
-                        <div class="val" style="color: var(--middle-blue)">3</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="metric-card card-kobi">
-                        <div class="lbl">Current GPA</div>
-                        <div class="val" style="color: var(--kobi)">8.75</div>
-                    </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 5px solid #20c997;">
+                <div class="card-body">
+                    <h6 class="text-muted fw-bold text-uppercase mb-2">Shortlisted</h6>
+                    <h2 class="display-5 fw-bold text-dark mb-0">{{ shortlisted|default:"0" }}</h2>
                 </div>
             </div>
-
-            <div class="row g-4">
-                <div class="col-lg-8">
-                    <div class="card p-4">
-                        <h6 class="fw-bold mb-4 text-dark"><i class="fas fa-layer-group me-2" style="color: var(--han-purple)"></i> My Applications</h6>
-                        
-                        <div class="job-card bg-white rounded-4 p-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
-                                    <h5 class="mb-0 fw-bold">Microsoft <span class="fw-normal text-muted" style="font-size:16px;">— Software Engineer</span></h5>
-                                </div>
-                                <span class="badge badge-stage rounded-pill px-3 py-2">Technical Round</span>
-                            </div>
-                            
-                            <div class="pipeline-container">
-                                <div class="pipeline-step completed">
-                                    <div class="step-circle"><i class="fas fa-check"></i></div>
-                                    <div class="step-label">Applied</div>
-                                </div>
-                                <div class="pipeline-step completed">
-                                    <div class="step-circle"><i class="fas fa-check"></i></div>
-                                    <div class="step-label">Written</div>
-                                </div>
-                                <div class="pipeline-step current">
-                                    <div class="step-circle"><i class="fas fa-code"></i></div>
-                                    <div class="step-label">Technical</div>
-                                </div>
-                                <div class="pipeline-step">
-                                    <div class="step-circle"></div>
-                                    <div class="step-label">HR</div>
-                                </div>
-                                <div class="pipeline-step">
-                                    <div class="step-circle"></div>
-                                    <div class="step-label">Placed</div>
-                                </div>
-                            </div>
-                            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i> Applied 12 Apr 2026</small>
-                        </div>
-
-                        <div class="job-card bg-white rounded-4 p-3 mb-2">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
-                                    <h5 class="mb-0 fw-bold">Amazon <span class="fw-normal text-muted" style="font-size:16px;">— Frontend Dev</span></h5>
-                                </div>
-                                <span class="badge rounded-pill px-3 py-2" style="background-color: rgba(224, 17, 95, 0.1); color: var(--ruby);">Rejected</span>
-                            </div>
-                            
-                            <div class="pipeline-container">
-                                <div class="pipeline-step completed">
-                                    <div class="step-circle"><i class="fas fa-check"></i></div>
-                                    <div class="step-label">Applied</div>
-                                </div>
-                                <div class="pipeline-step completed" style="filter: grayscale(100%);">
-                                    <div class="step-circle" style="background-color: var(--ruby);"><i class="fas fa-times"></i></div>
-                                    <div class="step-label" style="color: var(--ruby);">Written</div>
-                                </div>
-                                <div class="pipeline-step">
-                                    <div class="step-circle"></div>
-                                    <div class="step-label">Technical</div>
-                                </div>
-                                <div class="pipeline-step">
-                                    <div class="step-circle"></div>
-                                    <div class="step-label">HR</div>
-                                </div>
-                                <div class="pipeline-step">
-                                    <div class="step-circle"></div>
-                                    <div class="step-label">Placed</div>
-                                </div>
-                            </div>
-                            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i> Applied 05 Apr 2026</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="card p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-bell me-2" style="color: var(--maximum-yellow)"></i> Notifications</h6>
-                        </div>
-                        
-                        <div class="d-flex gap-3 py-3 border-bottom">
-                            <div class="notif-dot"></div>
-                            <div>
-                                <div style="font-size:14px; font-weight:500;">Google has posted a new drive for SDE-1.</div>
-                                <small class="text-muted">2 hours ago</small>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex gap-3 py-3 border-bottom">
-                            <div class="notif-dot" style="background-color: var(--kobi); box-shadow: 0 0 8px rgba(231, 159, 196, 0.4);"></div>
-                            <div>
-                                <div style="font-size:14px; font-weight:500;">Your resume for TCS Ninja was shortlisted!</div>
-                                <small class="text-muted">1 day ago</small>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button class="btn btn-sm btn-outline-dark rounded-pill px-4">Mark all as read</button>
-                        </div>
-                    </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 5px solid #fd7e14;">
+                <div class="card-body">
+                    <h6 class="text-muted fw-bold text-uppercase mb-2">Upcoming Interviews</h6>
+                    <h2 class="display-5 fw-bold text-dark mb-0">{{ upcoming_interviews|default:"0" }}</h2>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0" style="color: var(--midnight-blue);">Latest Campus Drives</h4>
+        <a href="{% url 'drives_list' %}" class="text-decoration-none fw-bold" style="color: var(--han-purple);">View All Drives <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+    
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Company & Role</th>
+                            <th>Package</th>
+                            <th>Eligibility (CGPA)</th>
+                            <th>Deadline</th>
+                            <th class="pe-4 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in available_jobs %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ job.company.company_name|default:"Company" }}</div>
+                                <div class="small text-muted">{{ job.title }}</div>
+                            </td>
+                            <td><span class="badge bg-success bg-opacity-10 text-success">{{ job.package_lpa }} LPA</span></td>
+                            <td>{{ job.min_gpa }} CGPA</td>
+                            <td>
+                                <i class="far fa-calendar-alt text-muted me-1"></i> 
+                                {{ job.application_deadline|date:"M d, Y" }}
+                            </td>
+                            <td class="pe-4 text-end">
+                                {% if profile.resume %}
+                                    <a href="{% url 'apply_drive' job.id %}" class="btn btn-sm text-white px-3 rounded-pill" style="background-color: var(--han-purple);">Apply Now</a>
+                                {% else %}
+                                    <button class="btn btn-sm btn-secondary px-3 rounded-pill opacity-50" disabled title="Upload resume first">Apply Now</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-briefcase mb-3" style="font-size: 2rem; color: #cbd5e1;"></i>
+                                <h5>No active drives right now</h5>
+                                <p class="small mb-0">Check back later for new placement opportunities.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

@@ -1,29 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CareerFlow</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        .login-container { height: 100vh; display: flex; align-items: center; justify-content: center; background: #f0f2f5; }
-        .login-card { width: 100%; max-width: 400px; padding: 30px; }
+        :root {
+            --han-purple: #5212ec;
+            --ruby: #e0115f;
+        }
+        .login-container { 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: #f0f2f5; 
+            position: relative; /* Required for the back button */
+        }
+        .login-card { 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 30px; 
+            border-radius: 15px; 
+            border: none;
+        }
+        /* Styling for the Back to Home link */
+        .back-to-home { 
+            position: absolute; 
+            top: 20px; 
+            left: 25px; 
+            color: #6c757d; 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 14px;
+            transition: 0.3s ease; 
+        }
+        .back-to-home:hover { 
+            color: var(--han-purple); 
+        }
     </style>
 </head>
 <body class="login-container">
-    <div class="card login-card shadow">
+
+    <a href="{% url 'home' %}" class="back-to-home">
+        <i class="fas fa-arrow-left me-2"></i>Back to Home
+    </a>
+
+    <div class="card login-card shadow-lg">
         <div class="text-center mb-4">
-            <h3>Login to Portal</h3>
+            <h3 class="fw-bold" style="color: var(--han-purple);">CareerFlow</h3>
             <p class="text-muted">Enter your credentials to continue</p>
         </div>
-        <form>
+
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger p-2 small text-center border-0 shadow-sm">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} p-2 small text-center border-0 shadow-sm">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             <div class="mb-3">
-                <label class="form-label">Username / Roll No</label>
-                <input type="text" class="form-control" placeholder="e.g. 1MS21CS001">
+                <label class="form-label text-muted small fw-bold text-uppercase">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                    <input type="text" name="username" class="form-control border-start-0 ps-0" required placeholder="Enter your username">
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control">
+
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold text-uppercase">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                    <input type="password" name="password" class="form-control border-start-0 ps-0" required placeholder="Enter your password">
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 py-2">Sign In</button>
+
+            <button type="submit" class="btn w-100 text-white fw-bold py-2 mb-4 shadow-sm" style="background-color: var(--han-purple); border-radius: 8px;">
+                <i class="fas fa-sign-in-alt me-2"></i> Login Securely
+            </button>
+
+            <div class="text-center mt-2 border-top pt-3">
+                <p class="text-muted small fw-medium mb-1">
+                    New student? <a href="{% url 'register_student' %}" class="text-decoration-none fw-bold" style="color: var(--han-purple);">Register here</a>
+                </p>
+                <p class="text-muted small fw-medium mb-0">
+                    Are you a recruiter? <a href="{% url 'register_hr' %}" class="text-decoration-none fw-bold" style="color: var(--ruby);">Partner with us</a>
+                </p>
+            </div>
         </form>
     </div>
+
 </body>
 </html>

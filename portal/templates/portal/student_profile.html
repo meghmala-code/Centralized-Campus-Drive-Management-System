@@ -165,100 +165,105 @@
         
         <hr class="mx-3 my-4 opacity-25">
         
-        <a href="{% url 'login' %}" class="nav-link text-danger">
+        <a href="{% url 'logout' %}" class="nav-link text-danger">
             <i class="fas fa-sign-out-alt me-2"></i> Logout
         </a>
     </div>
 </div>
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <h3 class="fw-bold mb-4 text-dark">Profile Settings</h3>
+        <div class="col-md-9 col-lg-10 p-4">
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <i class="fas fa-check-circle me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
-            <div class="row g-4">
-                <div class="col-lg-7">
-                    <div class="card p-2">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center gap-4 mb-5 pb-4 border-bottom">
-                                <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:70px; height:70px; font-size:24px">
-                                    AD
-                                </div>
-                                <div>
-                                    <div class="fw-bold fs-4 text-dark">Alex Doe</div>
-                                    <div class="text-muted" style="font-weight: 500;">
-                                        <i class="fas fa-id-card me-1" style="color: var(--kobi)"></i> 1MS21CS001 <span class="mx-2">•</span> 
-                                        <i class="fas fa-laptop-code me-1" style="color: var(--middle-blue)"></i> Computer Science and Engineering
-                                    </div>
-                                </div>
-                            </div>
-
-                            <form method="post" enctype="multipart/form-data">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <label class="form-label">First Name</label>
-                                        <input type="text" value="Alex">
-                                    </div>
-                                    <div class="col-md-6 mb-4">
-                                        <label class="form-label">Last Name</label>
-                                        <input type="text" value="Doe">
-                                    </div>
-                                    <div class="col-md-6 mb-4">
-                                        <label class="form-label">Contact Number</label>
-                                        <input type="tel" value="+91 98765 43210">
-                                    </div>
-                                    <div class="col-md-6 mb-4">
-                                        <label class="form-label">Current CGPA</label>
-                                        <input type="number" step="0.01" value="8.75">
-                                    </div>
-                                    <div class="col-md-12 mb-4">
-                                        <label class="form-label">GitHub / LeetCode Profile</label>
-                                        <input type="url" placeholder="https://github.com/yourusername">
-                                    </div>
-                                    <div class="col-md-12 mb-4">
-                                        <label class="form-label">Update Resume (PDF)</label>
-                                        <input type="file" accept=".pdf">
-                                    </div>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary w-100 mt-2">Save Profile Updates</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-5">
-                    
-                    <div class="card mb-4 p-2 border-top border-5" style="border-top-color: var(--kobi) !important;">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="fw-bold mb-0 text-dark">Technical Skills</h5>
-                                <button class="btn btn-sm btn-light rounded-circle"><i class="fas fa-pen text-muted"></i></button>
-                            </div>
-                            
-                            <div class="d-flex flex-wrap gap-2 mt-3">
-                                <span class="badge skill-badge">Java</span>
-                                <span class="badge skill-badge">Data Structures</span>
-                                <span class="badge skill-badge">Competitive Programming</span>
-                                <span class="badge skill-badge">JavaScript</span>
-                                <span class="badge skill-badge">HTML/CSS</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-2 border-top border-5" style="border-top-color: var(--middle-blue) !important;">
-                        <div class="card-body p-4 text-center">
-                            <div class="mb-3">
-                                <i class="fas fa-file-pdf" style="font-size: 3rem; color: var(--ruby);"></i>
-                            </div>
-                            <h5 class="fw-bold text-dark mb-1">Current Resume</h5>
-                            <p class="text-muted small mb-4">Alex_Doe_Resume_2026.pdf</p>
-                            
-                            <a href="#" class="btn btn-outline-primary w-100"><i class="fas fa-eye me-2"></i> View Document</a>
-                        </div>
-                    </div>
-
+    <div class="card shadow-sm border-0 mb-4 bg-white" style="border-top: 4px solid var(--han-purple); border-radius: 12px;">
+        <div class="card-body p-4 d-flex align-items-center">
+            <div class="me-4 text-white d-flex align-items-center justify-content-center shadow-sm" 
+                 style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--han-purple); font-size: 2.5rem; font-weight: bold;">
+                {{ request.user.first_name|first|upper }}
+            </div>
+            <div>
+                <h2 class="fw-bold mb-1" style="color: var(--midnight-blue);">
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                </h2>
+                <p class="text-muted mb-2 fw-medium">
+                    <i class="fas fa-id-badge me-2"></i> {{ request.user.username }} 
+                </p>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-envelope me-1 text-muted"></i> {{ request.user.email }}</span>
+                    {% if profile.branch %}
+                        <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-graduation-cap me-1 text-muted"></i> {{ profile.branch }}</span>
+                    {% endif %}
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div class="card shadow-sm border-0" style="border-radius: 12px;">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-4 pb-2 border-bottom" style="color: var(--midnight-blue);">Update Academic Details</h5>
+            
+            <form method="POST" action="{% url 'student_profile' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger p-2 small">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold text-uppercase">Phone Number</label>
+                        {{ form.phone }}
+                        <div class="text-danger small">{{ form.phone.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold text-uppercase">Current CGPA</label>
+                        {{ form.gpa }}
+                        <div class="text-danger small">{{ form.gpa.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold text-uppercase">Branch / Department</label>
+                        {{ form.branch }}
+                        <div class="text-danger small">{{ form.branch.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted small fw-bold text-uppercase">Graduation Year</label>
+                        {{ form.year_of_passing }}
+                        <div class="text-danger small">{{ form.year_of_passing.errors }}</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Technical Skills</label>
+                    {{ form.skills }}
+                    <div class="text-danger small">{{ form.skills.errors }}</div>
+                    <div class="form-text small mt-1">Separate skills with a comma (e.g., Python, SQL, React)</div>
+                </div>
+
+                <div class="mb-4 pt-2">
+                    <label class="form-label text-muted small fw-bold text-uppercase">Upload Resume (PDF)</label>
+                    {% if profile.resume %}
+                        <div class="mb-2 small">
+                            <span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Current Resume:</span> 
+                            <a href="{{ profile.resume.url }}" target="_blank" class="text-decoration-none">View File</a>
+                        </div>
+                    {% endif %}
+                    {{ form.resume }}
+                    <div class="text-danger small">{{ form.resume.errors }}</div>
+                </div>
+
+                <button type="submit" class="btn text-white fw-bold px-4 py-2" style="background-color: var(--han-purple); border-radius: 8px;">
+                    <i class="fas fa-save me-2"></i> Save Profile Details
+                </button>
+            </form>
         </div>
     </div>
 </div>

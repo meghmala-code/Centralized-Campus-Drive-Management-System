@@ -206,152 +206,75 @@
         
         <hr class="mx-3 my-4 opacity-25">
         
-        <a href="{% url 'login' %}" class="nav-link text-danger">
+        <a href="{% url 'logout' %}" class="nav-link text-danger">
             <i class="fas fa-sign-out-alt me-2"></i> Logout
         </a>
     </div>
 </div>
 
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <div class="mb-4">
-                <h3 class="fw-bold mb-1 text-dark">Application Tracking</h3>
-                <p class="text-muted">Monitor your progress across all active recruitment drives.</p>
-            </div>
+        <div class="col-md-9 col-lg-10 p-4">
+    
+    <div class="mb-4">
+        <h2 class="fw-bold mb-0" style="color: var(--midnight-blue);">My Applications</h2>
+        <p class="text-muted">Track the status of your campus placement drives.</p>
+    </div>
 
-            <div class="card p-2 mb-4 border-start border-5" style="border-start-color: var(--han-purple) !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-2">
-                        <div>
-                            <div class="company-title">Cisco Systems</div>
-                            <div class="text-muted mt-1" style="font-weight: 500;">
-                                <i class="fas fa-laptop-code me-1" style="color: var(--middle-blue)"></i> Network Engineer 
-                                <span class="mx-2 text-light-grey">|</span> 
-                                <i class="fas fa-rupee-sign me-1" style="color: var(--kobi)"></i> 18.0 LPA
-                            </div>
-                        </div>
-                        <div class="mt-3 mt-md-0">
-                            <span class="badge rounded-pill bg-primary-custom badge-status">In Progress</span>
-                        </div>
-                    </div>
-                    
-                    <div class="pipeline-wrapper">
-                        <div class="step-container">
-                            <div class="step-item done">
-                                <div class="step-circle"><i class="fas fa-check"></i></div>
-                                <div class="step-label">Applied</div>
-                            </div>
-                            <div class="step-item done">
-                                <div class="step-circle"><i class="fas fa-check"></i></div>
-                                <div class="step-label">Written Test</div>
-                            </div>
-                            <div class="step-item current">
-                                <div class="step-circle">3</div>
-                                <div class="step-label">Technical</div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-circle">4</div>
-                                <div class="step-label">HR</div>
-                            </div>
-                            <div class="step-item">
-                                <div class="step-circle">5</div>
-                                <div class="step-label">Placed</div>
-                            </div>
-                        </div>
-                    </div>
-                    <small class="text-muted mt-2 d-block"><i class="far fa-clock me-1"></i> Last updated: 14 May 2026</small>
-                </div>
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Company</th>
+                            <th>Role</th>
+                            <th>Applied On</th>
+                            <th>Current Status</th>
+                            <th class="pe-4">Notes / Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td class="ps-4 fw-bold text-dark">{{ app.job.company.company_name }}</td>
+                            <td>{{ app.job.title }}</td>
+                            <td>{{ app.applied_on|date:"M d, Y" }}</td>
+                            <td>
+                                {% if app.stage == 'applied' %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill"><i class="fas fa-paper-plane me-1"></i> Applied</span>
+                                {% elif app.stage == 'shortlisted' %}
+                                    <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill"><i class="fas fa-tasks me-1"></i> Shortlisted</span>
+                                {% elif app.stage == 'interview' %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill"><i class="fas fa-user-tie me-1"></i> Interview</span>
+                                {% elif app.stage == 'selected' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill"><i class="fas fa-trophy me-1"></i> Selected!</span>
+                                {% elif app.stage == 'rejected' %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill"><i class="fas fa-times-circle me-1"></i> Not Selected</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">{{ app.get_stage_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-4 text-muted small">
+                                {% if app.notes %}
+                                    "{{ app.notes }}"
+                                {% else %}
+                                    <span class="text-black-50 fst-italic">Application under review...</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-clipboard-list mb-3" style="font-size: 2rem; color: #cbd5e1;"></i>
+                                <h5>No applications yet</h5>
+                                <p class="small mb-3">You haven't applied to any campus drives.</p>
+                                <a href="{% url 'student_dashboard' %}" class="btn btn-sm text-white px-4 py-2 rounded-pill" style="background-color: var(--han-purple);">Browse Jobs</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-
-            <div class="card p-2 mb-4 border-start border-5" style="border-start-color: var(--middle-blue) !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-2">
-                        <div>
-                            <div class="company-title">Accenture</div>
-                            <div class="text-muted mt-1" style="font-weight: 500;">
-                                <i class="fas fa-laptop-code me-1" style="color: var(--middle-blue)"></i> Associate Software Engineer
-                                <span class="mx-2 text-light-grey">|</span> 
-                                <i class="fas fa-rupee-sign me-1" style="color: var(--kobi)"></i> 4.5 LPA
-                            </div>
-                        </div>
-                        <div class="mt-3 mt-md-0">
-                            <span class="badge rounded-pill bg-success-custom badge-status"><i class="fas fa-star me-1" style="color: var(--maximum-yellow)"></i> Placed</span>
-                        </div>
-                    </div>
-                    
-                    <div class="pipeline-wrapper">
-                        <div class="step-container">
-                            <div class="step-item done">
-                                <div class="step-circle"><i class="fas fa-check"></i></div>
-                                <div class="step-label">Applied</div>
-                            </div>
-                            <div class="step-item done">
-                                <div class="step-circle"><i class="fas fa-check"></i></div>
-                                <div class="step-label">Written Test</div>
-                            </div>
-                            <div class="step-item done">
-                                <div class="step-circle"><i class="fas fa-check"></i></div>
-                                <div class="step-label">Technical</div>
-                            </div>
-                            <div class="step-item done">
-                                <div class="step-circle"><i class="fas fa-check"></i></div>
-                                <div class="step-label">HR</div>
-                            </div>
-                            <div class="step-item done">
-                                <div class="step-circle" style="background-color: var(--maximum-yellow); color: #333;"><i class="fas fa-trophy"></i></div>
-                                <div class="step-label" style="color: #333">Placed</div>
-                            </div>
-                        </div>
-                    </div>
-                    <small class="text-muted mt-2 d-block"><i class="far fa-clock me-1"></i> Last updated: 02 May 2026</small>
-                </div>
-            </div>
-
-            <div class="card p-2 mb-4 border-start border-5" style="border-start-color: var(--ruby) !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-2">
-                        <div>
-                            <div class="company-title" style="color: #6c757d;">Deloitte</div>
-                            <div class="text-muted mt-1" style="font-weight: 500;">
-                                <i class="fas fa-laptop-code me-1" style="color: var(--middle-blue)"></i> Risk Advisory Analyst
-                                <span class="mx-2 text-light-grey">|</span> 
-                                <i class="fas fa-rupee-sign me-1" style="color: var(--kobi)"></i> 7.0 LPA
-                            </div>
-                        </div>
-                        <div class="mt-3 mt-md-0">
-                            <span class="badge rounded-pill bg-danger-custom badge-status">Not Selected</span>
-                        </div>
-                    </div>
-                    
-                    <div class="pipeline-wrapper">
-                        <div class="step-container">
-                            <div class="step-item done">
-                                <div class="step-circle"><i class="fas fa-check"></i></div>
-                                <div class="step-label">Applied</div>
-                            </div>
-                            <div class="step-item rejected">
-                                <div class="step-circle"><i class="fas fa-times"></i></div>
-                                <div class="step-label">Written Test</div>
-                            </div>
-                            <div class="step-item" style="opacity: 0.5;">
-                                <div class="step-circle">3</div>
-                                <div class="step-label">Technical</div>
-                            </div>
-                            <div class="step-item" style="opacity: 0.5;">
-                                <div class="step-circle">4</div>
-                                <div class="step-label">HR</div>
-                            </div>
-                            <div class="step-item" style="opacity: 0.5;">
-                                <div class="step-circle">5</div>
-                                <div class="step-label">Placed</div>
-                            </div>
-                        </div>
-                    </div>
-                    <small class="text-muted mt-2 d-block"><i class="far fa-clock me-1"></i> Last updated: 20 Apr 2026</small>
-                </div>
-            </div>
-
-            </div>
+        </div>
     </div>
 </div>
 

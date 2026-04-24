@@ -169,82 +169,67 @@
     </div>
 </div>
 
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="fw-bold mb-0 text-dark">Available Opportunities</h3>
+        <div class="col-md-9 col-lg-10 p-4">
+    
+    <div class="mb-4">
+        <h2 class="fw-bold mb-0" style="color: var(--midnight-blue);">Campus Drives</h2>
+        <p class="text-muted">Browse and apply to all active placement opportunities.</p>
+    </div>
+
+    {% if not profile.resume %}
+    <div class="alert alert-warning border-0 shadow-sm mb-4">
+        <i class="fas fa-exclamation-triangle me-2"></i> <strong>Action Required:</strong> You must upload your resume in your profile before you can apply to any of these drives.
+    </div>
+    {% endif %}
+
+    <div class="row">
+    <div class="col-12 mb-3">
+        <div class="badge bg-dark">System Check: Profile Found = {{ profile|yesno:"YES,NO" }} | Resume Found = {{ profile.resume|yesno:"YES,NO" }}</div>
+    </div>
+
+    {% for job in jobs %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm border-0" style="border-top: 4px solid var(--han-purple); border-radius: 10px;">
+            <div class="card-body d-flex flex-column">
                 
-                <div class="input-group" style="max-width: 300px;">
-                    <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" class="form-control border-start-0 rounded-end-pill" placeholder="Search companies or roles..." style="box-shadow: none;">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="fw-bold text-dark mb-0">{{ job.company.company_name }}</h5>
+                    <span class="badge bg-success bg-opacity-10 text-success px-2 py-1">{{ job.package_lpa }} LPA</span>
+                </div>
+                <h6 class="text-muted mb-3">{{ job.title }}</h6>
+
+                <div class="small mb-3 p-3 bg-light rounded">
+                    <div class="mb-2"><i class="fas fa-graduation-cap text-muted me-2" style="width: 16px;"></i> Min CGPA: <span class="fw-bold text-dark">{{ job.min_gpa }}</span></div>
+                    <div class="mb-2"><i class="fas fa-users text-muted me-2" style="width: 16px;"></i> Openings: <span class="fw-bold text-dark">{{ job.openings }}</span></div>
+                    <div><i class="far fa-calendar-alt text-muted me-2" style="width: 16px;"></i> Deadline: <span class="fw-bold text-danger">{{ job.application_deadline|date:"M d, Y" }}</span></div>
+                </div>
+
+                <div class="mb-4 flex-grow-1">
+                    <p class="text-muted small fw-bold text-uppercase mb-2" style="font-size: 11px;">Required Skills</p>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border">{{ job.required_skills }}</span>
+                </div>
+
+                <div class="mt-auto">
+                    {% if profile.resume %}
+                        <a href="{% url 'apply_drive' job.id %}" class="btn w-100 text-white fw-bold py-2" style="background-color: var(--han-purple); border-radius: 8px;">
+                            Apply Now <i class="fas fa-paper-plane ms-1"></i>
+                        </a>
+                    {% else %}
+                        <button class="btn w-100 btn-secondary fw-bold py-2 opacity-50" disabled>
+                            Upload Resume to Apply
+                        </button>
+                    {% endif %}
                 </div>
             </div>
-
-            <div class="card border-top border-5" style="border-top-color: var(--maximum-yellow) !important;">
-                <div class="card-body p-0">
-                    
-                    <div class="drive-row d-flex flex-column flex-md-row align-items-md-center justify-content-between p-4 border-bottom">
-                        <div class="mb-3 mb-md-0">
-                            <div class="fw-bold company-name mb-1">Google <span class="text-muted fw-normal" style="font-size:16px;">— Software Engineer (SDE-1)</span></div>
-                            <div class="text-muted small">
-                                <span class="me-3"><i class="fas fa-code-branch me-1" style="color: var(--kobi)"></i> CSE, ISE</span>
-                                <span class="me-3"><i class="fas fa-graduation-cap me-1" style="color: var(--middle-blue)"></i> Min GPA: 8.0</span>
-                                <span><i class="far fa-clock me-1" style="color: var(--ruby)"></i> Deadline: 30 May 2026</span>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-4">
-                            <div class="text-end d-none d-sm-block">
-                                <div class="lpa-text">32.0 LPA</div>
-                                <span class="badge badge-eligible rounded-pill px-3 py-1">Eligible</span>
-                            </div>
-                            <button class="btn btn-primary px-4">Apply Now</button>
-                        </div>
-                    </div>
-
-                    <div class="drive-row d-flex flex-column flex-md-row align-items-md-center justify-content-between p-4 border-bottom">
-                        <div class="mb-3 mb-md-0">
-                            <div class="fw-bold company-name mb-1">Microsoft <span class="text-muted fw-normal" style="font-size:16px;">— Cloud Solutions Architect</span></div>
-                            <div class="text-muted small">
-                                <span class="me-3"><i class="fas fa-code-branch me-1" style="color: var(--kobi)"></i> All Branches</span>
-                                <span class="me-3"><i class="fas fa-graduation-cap me-1" style="color: var(--middle-blue)"></i> Min GPA: 7.5</span>
-                                <span><i class="far fa-clock me-1" style="color: var(--ruby)"></i> Deadline: 25 May 2026</span>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-4">
-                            <div class="text-end d-none d-sm-block">
-                                <div class="lpa-text">45.0 LPA</div>
-                                <span class="badge badge-eligible rounded-pill px-3 py-1">Eligible</span>
-                            </div>
-                            <div style="min-width: 110px;" class="text-center">
-                                <span class="badge badge-applied rounded-pill px-4 py-2 fs-6"><i class="fas fa-check-circle me-1"></i> Applied</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="drive-row d-flex flex-column flex-md-row align-items-md-center justify-content-between p-4 border-bottom">
-                        <div class="mb-3 mb-md-0">
-                            <div class="fw-bold company-name mb-1" style="color: #6c757d;">Goldman Sachs <span class="text-muted fw-normal" style="font-size:16px;">— Quantitative Analyst</span></div>
-                            <div class="text-muted small">
-                                <span class="me-3"><i class="fas fa-code-branch me-1" style="color: var(--kobi)"></i> CSE Only</span>
-                                <span class="me-3"><i class="fas fa-graduation-cap me-1" style="color: var(--middle-blue)"></i> Min GPA: 9.5</span>
-                                <span><i class="far fa-clock me-1" style="color: var(--ruby)"></i> Deadline: 10 May 2026</span>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-4">
-                            <div class="text-end d-none d-sm-block">
-                                <div class="lpa-text text-muted">24.0 LPA</div>
-                                <span class="badge badge-not-eligible rounded-pill px-3 py-1">Not Eligible</span>
-                            </div>
-                            <button class="btn btn-disabled px-4" disabled>Apply Now</button>
-                        </div>
-                    </div>
-
-                    </div>
-            </div>
-
         </div>
     </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <p class="text-muted">No active drives found.</p>
+    </div>
+    {% endfor %}
 </div>
+        
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

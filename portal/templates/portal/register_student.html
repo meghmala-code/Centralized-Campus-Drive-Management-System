@@ -122,65 +122,69 @@
 
                 <div class="card-body p-4 p-md-5">
                     
-                    <form method="post" action="#">
-                        {% csrf_token %}
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">First Name</label>
-                                <input type="text" class="form-control" placeholder="e.g. Rahul">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Last Name</label>
-                                <input type="text" class="form-control" placeholder="e.g. Sharma">
-                            </div>
-                        </div>
+                   <form method="POST" action="{% url 'register_student' %}">
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger p-2 small">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Roll Number (USN)</label>
-                                <input type="text" class="form-control" placeholder="e.g. 1MS21CS001">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Branch</label>
-                                <select class="form-select">
-                                    <option value="" disabled selected>Select branch...</option>
-                                    <option value="CSE">Computer Science (CSE)</option>
-                                    <option value="ISE">Information Science (ISE)</option>
-                                    <option value="ECE">Electronics (ECE)</option>
-                                    <option value="ME">Mechanical (ME)</option>
-                                </select>
-                            </div>
-                        </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label text-muted small fw-bold text-uppercase">Username</label>
+            {{ form.username }}
+            <div class="text-danger small">{{ form.username.errors }}</div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label text-muted small fw-bold text-uppercase">Roll Number (USN)</label>
+            {{ form.roll_number }}
+            <div class="text-danger small">{{ form.roll_number.errors }}</div>
+        </div>
+    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">College Email Address</label>
-                            <input type="email" class="form-control" placeholder="your.name@college.edu">
-                            <div class="form-text small text-muted mt-1"><i class="fas fa-info-circle me-1"></i> Please use your official university email.</div>
-                        </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label text-muted small fw-bold text-uppercase">First Name</label>
+            {{ form.first_name }}
+            <div class="text-danger small">{{ form.first_name.errors }}</div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label text-muted small fw-bold text-uppercase">Last Name</label>
+            {{ form.last_name }}
+            <div class="text-danger small">{{ form.last_name.errors }}</div>
+        </div>
+    </div>
 
-                        <div class="row mb-4">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <label class="form-label">Password</label>
-                                <input type="password" class="form-control" placeholder="Create password">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" placeholder="Repeat password">
-                            </div>
-                        </div>
+    <div class="mb-4">
+        <label class="form-label text-muted small fw-bold text-uppercase">College Email Address</label>
+        {{ form.email }}
+        <div class="text-danger small">{{ form.email.errors }}</div>
+        <div class="form-text small mt-1"><i class="fas fa-info-circle me-1"></i> Use your official university email.</div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <label class="form-label text-muted small fw-bold text-uppercase">Password</label>
+            {{ form.password1 }}
+            <div class="text-danger small">{{ form.password1.errors }}</div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label text-muted small fw-bold text-uppercase">Confirm Password</label>
+            {{ form.password2 }}
+            <div class="text-danger small">{{ form.password2.errors }}</div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+        Register Account <i class="fas fa-arrow-right ms-2"></i>
+    </button>
 
-                        <button type="submit" class="btn btn-primary-custom mb-3">
-                            Register Account <i class="fas fa-arrow-right ms-2"></i>
-                        </button>
-
-                        <div class="text-center mt-4">
-                            <p class="text-muted small fw-medium mb-0">
-                                Already have an account? <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color: var(--han-purple);">Login here</a>
-                            </p>
-                        </div>
-
-                    </form>
+    <div class="text-center mt-3">
+        <p class="text-muted small fw-medium mb-0">
+            Already have an account? <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color: var(--han-purple);">Login here</a>
+        </p>
+    </div>
+</form>
                 </div>
             </div>
 

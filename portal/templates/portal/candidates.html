@@ -177,9 +177,6 @@
             <i class="fas fa-plus-circle me-2"></i> Post JD
         </a>
         
-        <a href="{% url 'hr_candidates' %}" class="nav-link active">
-            <i class="fas fa-users me-2"></i> Candidates
-        </a>
         
         <hr class="mx-3 my-4 opacity-25">
         
@@ -189,130 +186,107 @@
     </div>
 </div>
 
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-                <div class="mb-3 mb-md-0">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="bg-white shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; color: var(--ruby);">
-                            <i class="fas fa-building fs-5"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-0 header-title">Acme Corp <span class="text-dark fw-medium">— Software Engineer Intern</span></h6>
-                            <div class="text-muted small mt-1" style="font-weight: 500;">
-                                <i class="fas fa-rupee-sign me-1" style="color: var(--kobi)"></i> 12.0 LPA 
-                                <span class="mx-2">•</span> 
-                                <i class="far fa-calendar-alt me-1" style="color: var(--middle-blue)"></i> Drive: 20 May 2026
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                   <button class="btn btn-sm btn-outline-success fw-bold px-3 rounded-pill"><i class="fas fa-check me-1"></i> Shortlist</button>
-                </div>
+        <div class="col-md-9 col-lg-10 p-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a href="{% url 'hr_dashboard' %}" class="text-decoration-none" style="color: var(--ruby);">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Candidates</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0" style="color: var(--midnight-blue);">Applicants for {{ job.title }}</h2>
+            <p class="text-muted mt-1 mb-0">
+                <i class="fas fa-users me-1"></i> Total Applications: <strong>{{ applications.count }}</strong>
+                <span class="mx-2">|</span>
+                <i class="fas fa-graduation-cap me-1"></i> Min CGPA Required: <strong>{{ job.min_gpa }}</strong>
+            </p>
+        </div>
+        <a href="{% url 'hr_dashboard' %}" class="btn btn-outline-secondary shadow-sm">
+            <i class="fas fa-arrow-left me-2"></i> Back to Jobs
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <i class="fas fa-check-circle me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+        {% endfor %}
+    {% endif %}
 
-            <div class="card border-top border-5" style="border-top-color: var(--middle-blue) !important;">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead>
-                                <tr>
-                                    <th class="ps-4">Applicant Name</th>
-                                    <th>Roll No</th>
-                                    <th>Branch</th>
-                                    <th>GPA</th>
-                                    <th>Current Stage</th>
-                                    <th>Applied On</th>
-                                    <th class="text-end pe-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold me-3" style="width:32px; height:32px; color: var(--han-purple); font-size: 12px;">JD</div>
-                                            <strong>John Doe</strong>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">1MS21CS045</td>
-                                    <td><span class="fw-medium text-dark">CSE</span></td>
-                                    <td><strong style="color: var(--han-purple);">9.2</strong></td>
-                                    <td>
-                                        <span class="badge badge-stage bg-success-custom rounded-pill"><i class="fas fa-star text-warning me-1"></i> Placed</span>
-                                    </td>
-                                    <td class="text-muted small">12 May 2026</td>
-                                    <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-action btn-outline-update me-1" title="Update Status"><i class="fas fa-pencil-alt"></i></a>
-                                        <a href="#" class="btn btn-action btn-outline-cv" title="View CV"><i class="fas fa-file-pdf"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold me-3" style="width:32px; height:32px; color: var(--han-purple); font-size: 12px;">AS</div>
-                                            <strong>Alice Smith</strong>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">1MS21IS012</td>
-                                    <td><span class="fw-medium text-dark">ISE</span></td>
-                                    <td><strong style="color: var(--han-purple);">8.5</strong></td>
-                                    <td>
-                                        <span class="badge badge-stage bg-primary-custom rounded-pill">Technical Round</span>
-                                    </td>
-                                    <td class="text-muted small">14 May 2026</td>
-                                    <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-action btn-outline-update me-1" title="Update Status"><i class="fas fa-pencil-alt"></i></a>
-                                        <a href="#" class="btn btn-action btn-outline-cv" title="View CV"><i class="fas fa-file-pdf"></i></a>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold me-3" style="width:32px; height:32px; color: var(--han-purple); font-size: 12px;">BW</div>
-                                            <strong>Bob Wilson</strong>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">1MS21EC088</td>
-                                    <td><span class="fw-medium text-dark">ECE</span></td>
-                                    <td><strong style="color: var(--han-purple);">7.8</strong></td>
-                                    <td>
-                                        <span class="badge badge-stage bg-danger-custom rounded-pill">Rejected</span>
-                                    </td>
-                                    <td class="text-muted small">10 May 2026</td>
-                                    <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-action btn-outline-update me-1" title="Update Status"><i class="fas fa-pencil-alt"></i></a>
-                                        </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold me-3" style="width:32px; height:32px; color: var(--han-purple); font-size: 12px;">SJ</div>
-                                            <strong>Sarah Jenkins</strong>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">1MS21CS102</td>
-                                    <td><span class="fw-medium text-dark">CSE</span></td>
-                                    <td><strong style="color: var(--han-purple);">8.9</strong></td>
-                                    <td>
-                                        <span class="badge badge-stage bg-primary-custom rounded-pill">Applied</span>
-                                    </td>
-                                    <td class="text-muted small">18 May 2026</td>
-                                    <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-action btn-outline-update me-1" title="Update Status"><i class="fas fa-pencil-alt"></i></a>
-                                        <a href="#" class="btn btn-action btn-outline-cv" title="View CV"><i class="fas fa-file-pdf"></i></a>
-                                    </td>
-                                </tr>
-
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase">
+                        <tr>
+                            <th class="ps-4 py-3">Student Name</th>
+                            <th>Branch & CGPA</th>
+                            <th>Resume</th>
+                            <th>Applied On</th>
+                            <th>Current Stage</th>
+                            <th class="pe-4 text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ app.student.user.first_name }} {{ app.student.user.last_name }}</div>
+                                <div class="small text-muted">{{ app.student.user.email }}</div>
+                            </td>
+                            <td>
+                                <div>{{ app.student.branch }}</div>
+                                <div class="small fw-bold {% if app.student.gpa >= job.min_gpa %}text-success{% else %}text-danger{% endif %}">
+                                    {{ app.student.gpa }} CGPA
+                                </div>
+                            </td>
+                            <td>
+                                {% if app.student.resume %}
+                                    <a href="{{ app.student.resume.url }}" target="_blank" class="btn btn-sm btn-light border text-primary">
+                                        <i class="fas fa-file-pdf me-1"></i> View PDF
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small fst-italic">Missing</span>
+                                {% endif %}
+                            </td>
+                            <td class="small">{{ app.applied_on|date:"M d, Y" }}</td>
+                            <td>
+                                {% if app.stage == 'applied' %}
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">New Applicant</span>
+                                {% elif app.stage == 'shortlisted' %}
+                                    <span class="badge bg-info bg-opacity-10 text-info">Shortlisted</span>
+                                {% elif app.stage == 'interview' %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">Interviewing</span>
+                                {% elif app.stage == 'selected' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success">Selected</span>
+                                {% elif app.stage == 'rejected' %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark border">{{ app.get_stage_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-4 text-end">
+                                <a href="{% url 'update_application_status' app.id %}" class="btn btn-sm text-white px-3" style="background-color: var(--ruby);">
+                                    Update Status <i class="fas fa-edit ms-1"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-users-slash mb-3" style="font-size: 2.5rem; color: #cbd5e1;"></i>
+                                <h5>No candidates yet</h5>
+                                <p class="small mb-0">Students haven't started applying to this drive yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </div>
 </div>
