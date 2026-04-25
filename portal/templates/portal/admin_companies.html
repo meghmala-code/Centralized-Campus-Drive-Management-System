@@ -1,398 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Companies | Admin Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --han-purple: #5218FA;
-            --kobi: #E79FC4;
-            --maximum-yellow: #FAEF32;
-            --middle-blue: #7ED4E6;
-            --ruby: #E0115F;
-            --white: #FFFFFF;
-            --bg-light: #F8F9FB; 
-        }
+{% extends 'portal/base_admin.html' %}
+{% block title %}Manage Companies | Admin Portal{% endblock %}
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-light);
-            color: #2d3436;
-        }
-
-        /* --- Sidebar Navigation --- */
-        .sidebar {
-            background-color: var(--white);
-            min-height: 100vh;
-            border-right: 2px solid rgba(126, 212, 230, 0.2);
-            padding-top: 20px;
-        }
-        .sidebar-brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--han-purple);
-            text-decoration: none;
-            padding: 0 20px;
-            display: block;
-            margin-bottom: 30px;
-        }
-        .sidebar-brand span { color: var(--ruby); }
-        
-        .nav-link {
-            color: #6c757d;
-            font-weight: 500;
-            padding: 12px 25px;
-            margin: 5px 15px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        .nav-link:hover {
-            color: var(--han-purple);
-            background-color: rgba(82, 24, 250, 0.05);
-        }
-        /* Admin Theme Active State uses Maximum Yellow */
-        .nav-link.active {
-            background-color: var(--maximum-yellow); 
-            color: #333;
-            box-shadow: 0 4px 10px rgba(250, 239, 50, 0.3);
-            font-weight: 700;
-        }
-
-        /* --- Cards & General UI --- */
-        .card {
-            border: none;
-            background-color: var(--white);
-            border-radius: 16px !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-
-        .metric-mini {
-            padding: 15px 20px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .metric-mini-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        /* --- Search Bar --- */
-        .search-form .form-control {
-            border-radius: 8px 0 0 8px;
-            border: 2px solid #f0f0f0;
-            border-right: none;
-            padding: 10px 15px;
-            box-shadow: none;
-            font-family: inherit;
-        }
-        .search-form .form-control:focus {
-            border-color: var(--han-purple);
-            background-color: var(--white);
-        }
-        .search-form .btn {
-            border-radius: 0 8px 8px 0;
-            background-color: var(--han-purple);
-            color: white;
-            border: 2px solid var(--han-purple);
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .search-form .btn:hover {
-            background-color: var(--ruby);
-            border-color: var(--ruby);
-        }
-
-        /* --- Tables --- */
-        .table {
-            vertical-align: middle;
-            margin-bottom: 0;
-        }
-        .table thead th {
-            background-color: var(--bg-light);
-            color: var(--han-purple);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: none;
-            padding: 15px;
-            font-weight: 700;
-        }
-        .table tbody td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        .table-hover tbody tr:hover {
-            background-color: rgba(126, 212, 230, 0.05);
-        }
-
-        /* --- Badges --- */
-        .badge-status {
-            padding: 6px 12px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            font-size: 11px;
-        }
-        .bg-verified { background-color: rgba(126, 212, 230, 0.2); color: #0d5c6b; border: 1px solid var(--middle-blue); }
-        .bg-pending { background-color: rgba(250, 239, 50, 0.2); color: #857b0a; border: 1px solid var(--maximum-yellow); }
-        .bg-blacklisted { background-color: rgba(224, 17, 95, 0.1); color: var(--ruby); border: 1px solid var(--ruby); }
-
-        /* --- Action Buttons --- */
-        .btn-action {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
-        .btn-approve {
-            color: var(--middle-blue);
-            background: rgba(126, 212, 230, 0.1);
-            border-color: var(--middle-blue);
-        }
-        .btn-approve:hover { background: var(--middle-blue); color: white; }
-        
-        .btn-reject {
-            color: var(--ruby);
-            background: rgba(224, 17, 95, 0.1);
-            border-color: var(--ruby);
-        }
-        .btn-reject:hover { background: var(--ruby); color: white; }
-
-        .btn-view {
-            color: var(--han-purple);
-            background: transparent;
-            border-color: var(--han-purple);
-        }
-        .btn-view:hover { background: var(--han-purple); color: white; }
-        
-        .company-logo {
-            width: 40px; 
-            height: 40px; 
-            font-size: 16px; 
-            color: var(--han-purple); 
-            background-color: rgba(82, 24, 250, 0.1);
-            border-radius: 10px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
-    <a href="{% url 'home' %}" class="sidebar-brand">
-        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
-    </a>
-    
-    <div class="d-flex flex-column">
-        <div class="px-4 mb-3" style="font-size: 12px; font-weight: 800; color: var(--han-purple); text-transform: uppercase; letter-spacing: 0.05em;">Admin Portal</div>
-        
-        <a href="{% url 'admin_dashboard' %}" class="nav-link">
-            <i class="fas fa-chart-line me-2"></i> Dashboard
-        </a>
-        
-        <a href="{% url 'admin_students' %}" class="nav-link">
-            <i class="fas fa-user-graduate me-2"></i> Students
-        </a>
-        
-        <a href="{% url 'admin_companies' %}" class="nav-link active">
-            <i class="fas fa-building me-2"></i> Companies
-        </a>
-
-        
-        <a href="{% url 'admin_reports' %}" class="nav-link">
-            <i class="fas fa-chart-pie me-2"></i> Reports
-        </a>
-        
-        <hr class="mx-3 my-4 opacity-25">
-        
-        <a href="/admin/" class="nav-link text-secondary" target="_blank">
-            <i class="fas fa-cog me-2"></i> Django Admin
-        </a>
-        
-        <a href="{% url 'logout' %}" class="nav-link text-danger">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </a>
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div class="mb-3 mb-md-0">
+        <h3 class="fw-bold mb-0 text-dark">Partner Companies</h3>
+        <p class="text-muted small">Verify new recruiter registrations and manage existing partners.</p>
     </div>
 </div>
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-                <div class="mb-3 mb-md-0">
-                    <h3 class="fw-bold mb-0 text-dark">Partner Companies</h3>
-                    <p class="text-muted small">Verify new recruiter registrations and manage existing partners.</p>
-                </div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card metric-mini">
+            <div class="metric-mini-icon" style="background-color: rgba(126, 212, 230, 0.2); color: var(--middle-blue);">
+                <i class="fas fa-check-circle"></i>
             </div>
-
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <div class="card metric-mini">
-                        <div class="metric-mini-icon" style="background-color: rgba(126, 212, 230, 0.2); color: var(--middle-blue);">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-bold text-uppercase">Verified Partners</div>
-                            <div class="fs-4 fw-bold text-dark">86</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card metric-mini" style="border: 2px solid var(--maximum-yellow);">
-                        <div class="metric-mini-icon" style="background-color: rgba(250, 239, 50, 0.2); color: #857b0a;">
-                            <i class="fas fa-hourglass-half"></i>
-                        </div>
-                        <div>
-                            <div class="text-muted small fw-bold text-uppercase">Pending Approval</div>
-                            <div class="fs-4 fw-bold" style="color: #857b0a;">3</div>
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <div class="text-muted small fw-bold text-uppercase">Verified Partners</div>
+                <div class="fs-4 fw-bold text-dark">{{ verified_count|default:"0" }}</div>
             </div>
-
-            <div class="card border-top border-5" style="border-top-color: var(--kobi) !important;">
-                <div class="card-body p-0">
-                    
-                    <div class="p-4 border-bottom bg-white" style="border-radius: 16px 16px 0 0;">
-                        <form class="search-form d-flex w-100" style="max-width: 500px;" method="get">
-                            <input type="text" name="q" class="form-control" placeholder="Search by company name or HR email..." value="">
-                            <button class="btn" type="submit"><i class="fas fa-search"></i></button>
-                        </form>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="ps-4">Company Details</th>
-                                    <th>HR Contact</th>
-                                    <th>Contact Email</th>
-                                    <th>Verification</th>
-                                    <th class="text-center">Active Jobs</th>
-                                    <th class="text-end pe-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                
-                                <tr style="background-color: rgba(250, 239, 50, 0.03);">
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="company-logo d-flex align-items-center justify-content-center fw-bold me-3" style="color: #857b0a; background-color: rgba(250, 239, 50, 0.2);">S</div>
-                                            <div>
-                                                <strong>StartupX Technologies</strong><br>
-                                                <a href="#" class="small text-muted text-decoration-none" target="_blank">www.startupx.io</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="fw-medium text-dark">Michael Chen</td>
-                                    <td class="text-muted">m.chen@startupx.io</td>
-                                    <td>
-                                        <span class="badge badge-status bg-pending rounded-pill"><i class="fas fa-clock me-1"></i> Pending</span>
-                                    </td>
-                                    <td class="text-center fw-bold text-muted">—</td>
-                                    <td class="text-end pe-4">
-                                        <button class="btn btn-action btn-approve me-1" title="Approve Company"><i class="fas fa-check"></i></button>
-                                        <button class="btn btn-action btn-reject" title="Reject / Delete"><i class="fas fa-times"></i></button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="company-logo d-flex align-items-center justify-content-center fw-bold me-3">G</div>
-                                            <div>
-                                                <strong style="color: var(--han-purple);">Google India</strong><br>
-                                                <a href="#" class="small text-muted text-decoration-none" target="_blank">careers.google.com</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="fw-medium text-dark">Priya Sharma</td>
-                                    <td class="text-muted">psharma@google.com</td>
-                                    <td>
-                                        <span class="badge badge-status bg-verified rounded-pill"><i class="fas fa-shield-check me-1"></i> Verified</span>
-                                    </td>
-                                    <td class="text-center fw-bold text-dark">2</td>
-                                    <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-action btn-view me-1" title="View Profile"><i class="fas fa-eye"></i></a>
-                                        <button class="btn btn-action btn-reject" title="Blacklist Company"><i class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="company-logo d-flex align-items-center justify-content-center fw-bold me-3" style="color: var(--ruby); background-color: rgba(224, 17, 95, 0.1);">M</div>
-                                            <div>
-                                                <strong style="color: var(--han-purple);">Microsoft</strong><br>
-                                                <a href="#" class="small text-muted text-decoration-none" target="_blank">careers.microsoft.com</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="fw-medium text-dark">David Miller</td>
-                                    <td class="text-muted">dmiller@microsoft.com</td>
-                                    <td>
-                                        <span class="badge badge-status bg-verified rounded-pill"><i class="fas fa-shield-check me-1"></i> Verified</span>
-                                    </td>
-                                    <td class="text-center fw-bold text-dark">1</td>
-                                    <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-action btn-view me-1" title="View Profile"><i class="fas fa-eye"></i></a>
-                                        <button class="btn btn-action btn-reject" title="Blacklist Company"><i class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center" style="opacity: 0.6;">
-                                            <div class="company-logo d-flex align-items-center justify-content-center fw-bold me-3" style="color: #6c757d; background-color: #e9ecef;">S</div>
-                                            <div>
-                                                <strong class="text-muted">ScamCorp Ltd.</strong><br>
-                                                <span class="small text-muted">www.fakejobs.com</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="fw-medium text-muted">John Fake</td>
-                                    <td class="text-muted">john@fakejobs.com</td>
-                                    <td>
-                                        <span class="badge badge-status bg-blacklisted rounded-pill"><i class="fas fa-ban me-1"></i> Blacklisted</span>
-                                    </td>
-                                    <td class="text-center fw-bold text-muted">—</td>
-                                    <td class="text-end pe-4">
-                                        <a href="#" class="btn btn-action btn-view me-1" title="View Reason"><i class="fas fa-eye"></i></a>
-                                        <button class="btn btn-action btn-approve" title="Restore Company"><i class="fas fa-undo"></i></button>
-                                    </td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card metric-mini" style="border: 2px solid var(--maximum-yellow);">
+            <div class="metric-mini-icon" style="background-color: rgba(250, 239, 50, 0.2); color: #857b0a;">
+                <i class="fas fa-hourglass-half"></i>
             </div>
-
+            <div>
+                <div class="text-muted small fw-bold text-uppercase">Pending Approval</div>
+                <div class="fs-4 fw-bold" style="color: #857b0a;">{{ pending_count|default:"0" }}</div>
+            </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<div class="card border-top border-5" style="border-top-color: var(--kobi) !important;">
+    <div class="card-body p-0">
+        
+        <div class="p-4 border-bottom bg-white" style="border-radius: 16px 16px 0 0;">
+            <form class="search-form d-flex w-100" style="max-width: 500px;" method="get">
+                <input type="text" name="q" class="form-control" placeholder="Search by company name or HR email..." value="{{ request.GET.q }}">
+                <button class="btn" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Company Details</th>
+                        <th>HR Contact</th>
+                        <th>Contact Email</th>
+                        <th>Verification</th>
+                        <th class="text-center">Active Jobs</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in companies %}
+                    <tr {% if not company.is_verified %}style="background-color: rgba(250, 239, 50, 0.03);"{% endif %}>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="company-logo d-flex align-items-center justify-content-center fw-bold me-3" 
+                                     style="{% if not company.is_verified %}color: #857b0a; background-color: rgba(250, 239, 50, 0.2);{% else %}color: var(--ruby); background-color: rgba(224, 17, 95, 0.1);{% endif %}">
+                                    {{ company.company_name|first|upper|default:"C" }}
+                                </div>
+                                <div>
+                                    <strong class="{% if not company.is_verified %}text-dark{% endif %}" style="{% if company.is_verified %}color: var(--han-purple);{% endif %}">
+                                        {{ company.company_name }}
+                                    </strong><br>
+                                    <a href="{{ company.website|default:'#' }}" class="small text-muted text-decoration-none" target="_blank">{{ company.website|default:"No website" }}</a>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="fw-medium text-dark">{{ company.user.get_full_name|default:"HR Manager" }}</td>
+                        <td class="text-muted">{{ company.user.email }}</td>
+                        <td>
+                            {% if company.is_verified %}
+                                <span class="badge badge-status bg-verified rounded-pill"><i class="fas fa-shield-check me-1"></i> Verified</span>
+                            {% else %}
+                                <span class="badge badge-status bg-pending rounded-pill"><i class="fas fa-clock me-1"></i> Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center fw-bold {% if company.is_verified %}text-dark{% else %}text-muted{% endif %}">
+                            {% if company.is_verified %}{{ company.jobposting_set.count|default:"0" }}{% else %}—{% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            {% if not company.is_verified %}
+                                <form action="{% url 'verify_company' company.id %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-action btn-approve me-1" title="Approve Company"><i class="fas fa-check"></i></button>
+                                </form>
+                                <button class="btn btn-action btn-reject" title="Reject / Delete"><i class="fas fa-times"></i></button>
+                            {% else %}
+                                <a href="#" class="btn btn-action btn-view me-1" title="View Profile"><i class="fas fa-eye"></i></a>
+                                <button class="btn btn-action btn-reject" title="Revoke Access"><i class="fas fa-ban"></i></button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fas fa-building fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0 fw-medium">No partner companies found in the system.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

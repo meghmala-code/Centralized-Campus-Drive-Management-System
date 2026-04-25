@@ -1,319 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Dashboard | CareerFlow</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --han-purple: #5218FA;
-            --kobi: #E79FC4;
-            --maximum-yellow: #FAEF32;
-            --middle-blue: #7ED4E6;
-            --ruby: #E0115F;
-            --white: #FFFFFF;
-            --bg-light: #F8F9FB; 
-        }
+{% extends 'portal/base_hr.html' %}
+{% block title %}HR Dashboard | CareerFlow{% endblock %}
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-light);
-            color: #2d3436;
-        }
+{% block extra_css %}
+<style>
+    .alert-warning-custom {
+        background-color: rgba(250, 239, 50, 0.15);
+        border: 1px solid var(--maximum-yellow);
+        color: #857b0a;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    .btn-outline-muted {
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+    .btn-outline-muted:hover {
+        background-color: #f8f9fa;
+        color: #495057;
+        border-color: #adb5bd;
+    }
+</style>
+{% endblock %}
 
-        /* --- Sidebar Navigation --- */
-        .sidebar {
-            background-color: var(--white);
-            min-height: 100vh;
-            border-right: 2px solid rgba(126, 212, 230, 0.2);
-            padding-top: 20px;
-        }
-        .sidebar-brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--han-purple);
-            text-decoration: none;
-            padding: 0 20px;
-            display: block;
-            margin-bottom: 30px;
-        }
-        .sidebar-brand span { color: var(--ruby); }
-        
-        .nav-link {
-            color: #6c757d;
-            font-weight: 500;
-            padding: 12px 25px;
-            margin: 5px 15px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        .nav-link:hover {
-            color: var(--han-purple);
-            background-color: rgba(82, 24, 250, 0.05);
-        }
-        .nav-link.active {
-            background-color: var(--han-purple);
-            color: var(--white);
-            box-shadow: 0 4px 10px rgba(82, 24, 250, 0.3);
-        }
-
-        /* --- Custom Alerts --- */
-        .alert-warning-custom {
-            background-color: rgba(250, 239, 50, 0.15); /* Maximum Yellow light */
-            border: 1px solid var(--maximum-yellow);
-            color: #857b0a; /* Darker yellow for text */
-            border-radius: 12px;
-            font-weight: 500;
-        }
-
-        /* --- Dashboard Cards --- */
-        .card {
-            border: none;
-            background-color: var(--white);
-            border-radius: 16px !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-        
-        /* Metric Cards */
-        .metric-card {
-            padding: 20px;
-            border-radius: 16px;
-            background-color: var(--white);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            border-bottom: 4px solid var(--han-purple);
-            transition: transform 0.2s;
-        }
-        .metric-card:hover { transform: translateY(-5px); }
-        .metric-card.card-blue { border-bottom-color: var(--middle-blue); }
-        .metric-card.card-kobi { border-bottom-color: var(--kobi); }
-        
-        .metric-card .lbl {
-            font-size: 13px;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 700;
-        }
-        .metric-card .val {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--han-purple);
-            margin-top: 5px;
-        }
-
-        /* --- Tables --- */
-        .table {
-            vertical-align: middle;
-            margin-bottom: 0;
-        }
-        .table thead th {
-            background-color: var(--bg-light);
-            color: #6c757d;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: none;
-            padding: 15px;
-        }
-        .table tbody td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        .table-hover tbody tr:hover {
-            background-color: rgba(126, 212, 230, 0.05); /* Very light Middle Blue */
-        }
-
-        /* --- Badges & Buttons --- */
-        .badge-status {
-            padding: 6px 12px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            font-size: 11px;
-        }
-        .bg-active { background-color: rgba(126, 212, 230, 0.2); color: #0d5c6b; border: 1px solid var(--middle-blue); }
-        .bg-draft { background-color: rgba(250, 239, 50, 0.2); color: #857b0a; border: 1px solid var(--maximum-yellow); }
-        .bg-closed { background-color: #f1f3f5; color: #6c757d; border: 1px solid #dee2e6; }
-
-        .btn-primary-custom {
-            background-color: var(--han-purple);
-            color: white;
-            border: none;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-        .btn-primary-custom:hover {
-            background-color: var(--ruby);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .btn-outline-custom {
-            color: var(--han-purple);
-            border: 1px solid var(--han-purple);
-            font-weight: 600;
-            border-radius: 8px;
-        }
-        .btn-outline-custom:hover {
-            background-color: var(--han-purple);
-            color: white;
-        }
-        
-        .btn-outline-muted {
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-            font-weight: 600;
-            border-radius: 8px;
-        }
-        .btn-outline-muted:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-            border-color: #adb5bd;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
-    <a href="{% url 'home' %}" class="sidebar-brand">
-        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
-    </a>
-    
-    <div class="d-flex flex-column">
-        <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Recruiter Portal</div>
-        
-        <a href="{% url 'hr_dashboard' %}" class="nav-link active">
-            <i class="fas fa-chart-line me-2"></i> Dashboard
-        </a>
-        
-        <a href="{% url 'post_job' %}" class="nav-link">
-            <i class="fas fa-plus-circle me-2"></i> Post JD
-        </a>
-        
-        
-        <hr class="mx-3 my-4 opacity-25">
-        
-        <a href="{% url 'logout' %}" class="nav-link text-danger">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </a>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0 text-dark">{{ company.company_name|default:"Company" }} Dashboard</h3>
+        <p class="text-muted small">Manage your hiring drives and candidates.</p>
     </div>
 </div>
 
-        <div class="col-md-9 col-lg-10 p-4">
-    
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold mb-0" style="color: var(--midnight-blue);">Welcome, {{ request.user.first_name }}!</h2>
-            <p class="text-muted">{{ company.company_name }} | {{ company.industry }}</p>
-        </div>
-        {% if company.is_verified %}
-    <a href="{% url 'post_job' %}" class="btn text-white fw-bold shadow-sm" style="background-color: var(--ruby);">
-        <i class="fas fa-plus me-2"></i> Post New JD
-    </a>
-{% else %}
-    <button class="btn btn-secondary fw-bold shadow-sm opacity-75" disabled title="Pending Admin Approval">
-        <i class="fas fa-lock me-2"></i> Post New JD (Locked)
-    </button>
+{% if not company.is_verified %}
+<div class="alert alert-warning-custom d-flex align-items-center mb-4 p-3 shadow-sm" role="alert">
+    <i class="fas fa-exclamation-triangle fs-4 me-3"></i>
+    <div>Your company is pending admin verification. You cannot post jobs yet.</div>
+</div>
 {% endif %}
-    </div>
 
-    {% if not company.is_verified %}
-    <div class="alert alert-warning border-0 shadow-sm mb-4">
-        <i class="fas fa-exclamation-triangle me-2"></i> Your company account is currently pending admin verification. You will not be able to post jobs until verified.
-    </div>
-    {% endif %}
-
-    <div class="row mb-5">
-        <div class="col-md-4 mb-3">
-            <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 5px solid var(--han-purple);">
-                <div class="card-body">
-                    <h6 class="text-muted fw-bold text-uppercase mb-2">Total Applicants</h6>
-                    <h2 class="display-5 fw-bold text-dark mb-0">{{ total_applicants }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 5px solid #fd7e14;">
-                <div class="card-body">
-                    <h6 class="text-muted fw-bold text-uppercase mb-2">Shortlisted (Test/Interview)</h6>
-                    <h2 class="display-5 fw-bold text-dark mb-0">{{ shortlisted }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card stat-card shadow-sm border-0 h-100" style="border-left: 5px solid #20c997;">
-                <div class="card-body">
-                    <h6 class="text-muted fw-bold text-uppercase mb-2">Offers Extended</h6>
-                    <h2 class="display-5 fw-bold text-dark mb-0">{{ offers }}</h2>
-                </div>
-            </div>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div class="lbl">Total Applicants</div>
+            <div class="val">{{ total_applicants|default:"0" }}</div>
         </div>
     </div>
-
-    <h4 class="fw-bold mb-3" style="color: var(--midnight-blue);">Your Active Drives</h4>
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-muted small text-uppercase">
-                        <tr>
-                            <th class="ps-4 py-3">Role / Title</th>
-                            <th>Package</th>
-                            <th>Deadline</th>
-                            <th>Status</th>
-                            <th>Applicants</th>
-                            <th class="pe-4 text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for job in jobs %}
-                        <tr>
-                            <td class="ps-4 fw-bold text-dark">{{ job.title }}</td>
-                            <td>{{ job.package_lpa }} LPA</td>
-                            <td>{{ job.application_deadline|date:"M d, Y" }}</td>
-                            <td>
-                                {% if job.status == 'active' %}
-                                    <span class="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill">Active</span>
-                                {% elif job.status == 'draft' %}
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-2 py-1 rounded-pill">Draft</span>
-                                {% else %}
-                                    <span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 rounded-pill">Closed</span>
-                                {% endif %}
-                            </td>
-                            <td><span class="badge bg-light text-dark border">{{ job.applicant_count }}</span></td>
-                            <td class="pe-4 text-end">
-                                <a href="{% url 'hr_candidates' job.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                    View Candidates
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="fas fa-folder-open mb-3" style="font-size: 2rem;"></i>
-                                <h5>No active job drives</h5>
-                                <p class="small">You haven't posted any job requirements yet.</p>
-                                <a href="{% url 'post_job' %}" class="btn btn-sm text-white" style="background-color: var(--ruby);">Post your first Job</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="col-md-4">
+        <div class="metric-card card-blue">
+            <div class="lbl">Shortlisted</div>
+            <div class="val" style="color: var(--middle-blue)">{{ shortlisted|default:"0" }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card card-kobi">
+            <div class="lbl">Offers Extended</div>
+            <div class="val" style="color: var(--kobi)">{{ offers|default:"0" }}</div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<div class="card border-top border-5" style="border-top-color: var(--han-purple) !important;">
+    <div class="card-body p-0">
+        <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+            <h5 class="fw-bold mb-0 text-dark">Job Postings</h5>
+            <a href="{% url 'post_job' %}" class="btn btn-sm btn-primary-custom px-3 py-2 {% if not company.is_verified %}disabled{% endif %}">
+                <i class="fas fa-plus me-1"></i> Post New JD
+            </a>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Role</th>
+                        <th>Package</th>
+                        <th>Applicants</th>
+                        <th>Status</th>
+                        <th>Drive Date</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    <tr>
+                        <td class="ps-4"><div class="fw-bold" style="color: var(--han-purple);">{{ job.title }}</div></td>
+                        <td><div class="fw-bold" style="color: var(--ruby);">{{ job.package|default:"-" }} LPA</div></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-users me-2 text-muted"></i> {{ job.applicant_count|default:"0" }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if job.status == 'active' %}
+                                <span class="badge badge-status bg-active rounded-pill">Active</span>
+                            {% elif job.status == 'closed' %}
+                                <span class="badge badge-status bg-closed rounded-pill">Closed</span>
+                            {% else %}
+                                <span class="badge badge-status bg-draft rounded-pill">Draft</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted"><i class="far fa-calendar-alt me-1"></i> {{ job.created_at|date:"d M Y" }}</td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'hr_candidates' job_pk=job.id %}" class="btn btn-sm btn-outline-custom me-1">Candidates</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted fst-italic">
+                            <i class="fas fa-file-alt fa-2x mb-3 opacity-25"></i><br>
+                            You have not posted any jobs yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

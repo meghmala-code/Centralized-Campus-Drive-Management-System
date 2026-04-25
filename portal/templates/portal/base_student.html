@@ -1,0 +1,33 @@
+{% extends 'portal/base.html' %}
+
+{% block sidebar %}
+<a href="{% url 'home' %}" class="sidebar-brand">
+    <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
+</a>
+
+<div class="d-flex flex-column">
+    <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Student Portal</div>
+    
+    <a href="{% url 'student_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+        <i class="fas fa-th-large me-2"></i> Dashboard
+    </a>
+    
+    <a href="{% url 'student_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'student_profile' %}active{% endif %}">
+        <i class="fas fa-user me-2"></i> My Profile
+    </a>
+    
+    <a href="{% url 'drives_list' %}" class="nav-link {% if request.resolver_match.url_name == 'drives_list' %}active{% endif %}">
+        <i class="fas fa-briefcase me-2"></i> Browse Drives
+    </a>
+    
+    <a href="{% url 'my_status' %}" class="nav-link {% if request.resolver_match.url_name == 'my_status' %}active{% endif %}">
+        <i class="fas fa-clipboard-check me-2"></i> My Status
+    </a>
+    
+    <hr class="mx-3 my-4 opacity-25">
+    
+    <a href="{% url 'logout' %}" class="nav-link text-danger">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+    </a>
+</div>
+{% endblock %}

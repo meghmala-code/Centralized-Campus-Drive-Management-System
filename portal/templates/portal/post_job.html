@@ -1,277 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post New JD | CareerFlow</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --han-purple: #5218FA;
-            --kobi: #E79FC4;
-            --maximum-yellow: #FAEF32;
-            --middle-blue: #7ED4E6;
-            --ruby: #E0115F;
-            --white: #FFFFFF;
-            --bg-light: #F8F9FB; 
-        }
+{% extends 'portal/base_hr.html' %}
+{% block title %}Post New JD | CareerFlow{% endblock %}
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-light);
-            color: #2d3436;
-        }
-
-        /* --- Sidebar Navigation --- */
-        .sidebar {
-            background-color: var(--white);
-            min-height: 100vh;
-            border-right: 2px solid rgba(126, 212, 230, 0.2);
-            padding-top: 20px;
-        }
-        .sidebar-brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--han-purple);
-            text-decoration: none;
-            padding: 0 20px;
-            display: block;
-            margin-bottom: 30px;
-        }
-        .sidebar-brand span { color: var(--ruby); }
-        
-        .nav-link {
-            color: #6c757d;
-            font-weight: 500;
-            padding: 12px 25px;
-            margin: 5px 15px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        .nav-link:hover {
-            color: var(--han-purple);
-            background-color: rgba(82, 24, 250, 0.05);
-        }
-        .nav-link.active {
-            background-color: var(--han-purple);
-            color: var(--white);
-            box-shadow: 0 4px 10px rgba(82, 24, 250, 0.3);
-        }
-
-        /* --- UI Cards --- */
-        .card {
-            border: none;
-            background-color: var(--white);
-            border-radius: 16px !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-
-        /* --- Auto-styling for Django forms --- */
-        form input, form select, form textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid #f0f0f0;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
-        }
-
-        form input:focus, form select:focus, form textarea:focus {
-            border-color: var(--middle-blue);
-            background-color: var(--white);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(126, 212, 230, 0.15);
-        }
-
-        .form-label {
-            font-size: 12px;
-            color: var(--han-purple);
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        /* --- Buttons --- */
-        .btn-primary-custom {
-            background-color: var(--han-purple);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-weight: 700;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .btn-primary-custom:hover {
-            background-color: var(--ruby);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(224, 17, 95, 0.2);
-        }
-
-        .btn-outline-custom {
-            color: #6c757d;
-            border: 2px solid #e9ecef;
-            background-color: transparent;
-            padding: 12px 24px;
-            font-weight: 600;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .btn-outline-custom:hover {
-            border-color: var(--ruby);
-            color: var(--ruby);
-            background-color: rgba(224, 17, 95, 0.05);
-        }
-    </style>
-</head>
-<body>
-
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
-    <a href="{% url 'home' %}" class="sidebar-brand">
-        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
-    </a>
-    
-    <div class="d-flex flex-column">
-        <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Recruiter Portal</div>
-        
-        <a href="{% url 'hr_dashboard' %}" class="nav-link">
-            <i class="fas fa-chart-line me-2"></i> Dashboard
-        </a>
-     
-        <hr class="mx-3 my-4 opacity-25">
-        
-        <a href="{% url 'logout' %}" class="nav-link text-danger">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </a>
-    </div>
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-0 text-dark">Create Job Description</h3>
+    <p class="text-muted small">Post a new opportunity to the student portal.</p>
 </div>
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <div class="mb-4">
-                <h3 class="fw-bold mb-0 text-dark">Create Job Description</h3>
-                <p class="text-muted small">Post a new opportunity to the student portal.</p>
-            </div>
 
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="card border-top border-5" style="border-top-color: var(--ruby) !important;">
-                        <div class="card-body p-4 p-lg-5">
-                            
-                            <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; color: var(--ruby); font-size: 1.5rem;">
-                                    <i class="fas fa-file-signature"></i>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-0">Job Details</h5>
-                                    <small class="text-muted">Fill in the requirements for the new drive.</small>
-                                </div>
-                            </div>
-
-<form method="POST" action="{% url 'post_job' %}">
-    {% csrf_token %}
-    
-    {% if form.non_field_errors %}
-        <div class="alert alert-danger p-2 small">
-            {{ form.non_field_errors }}
-        </div>
-    {% endif %}
-
-    <div class="row">
-        <div class="col-md-8 mb-3">
-            <label class="form-label text-muted small fw-bold text-uppercase">Job Title / Role</label>
-            {{ form.title }}
-            <div class="text-danger small">{{ form.title.errors }}</div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label class="form-label text-muted small fw-bold text-uppercase">Number of Openings</label>
-            {{ form.openings }}
-            <div class="text-danger small">{{ form.openings.errors }}</div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label class="form-label text-muted small fw-bold text-uppercase">Package (LPA)</label>
-            {{ form.package_lpa }}
-            <div class="text-danger small">{{ form.package_lpa.errors }}</div>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label text-muted small fw-bold text-uppercase">Minimum CGPA</label>
-            {{ form.min_gpa }}
-            <div class="text-danger small">{{ form.min_gpa.errors }}</div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label class="form-label text-muted small fw-bold text-uppercase">Application Deadline</label>
-            {{ form.application_deadline }}
-            <div class="text-danger small">{{ form.application_deadline.errors }}</div>
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label text-muted small fw-bold text-uppercase">Expected Interview Date</label>
-            {{ form.interview_date }}
-            <div class="text-danger small">{{ form.interview_date.errors }}</div>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label text-muted small fw-bold text-uppercase">Required Skills</label>
-        {{ form.required_skills }}
-        <div class="text-danger small">{{ form.required_skills.errors }}</div>
-    </div>
-    <div class="mb-3">
-        <label class="form-label text-muted small fw-bold text-uppercase">Job Description</label>
-        {{ form.description }}
-        <div class="text-danger small">{{ form.description.errors }}</div>
-    </div>
-
-    <div class="row mb-4 border-top pt-3 mt-3">
-        <div class="col-md-8">
-            <label class="form-label text-muted small fw-bold text-uppercase">Eligible Branches</label>
-            <div class="d-flex flex-wrap gap-3 mt-2">
-                {{ form.eligible_branches }}
-            </div>
-            <div class="text-danger small">{{ form.eligible_branches.errors }}</div>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label text-muted small fw-bold text-uppercase">Initial Status</label>
-            {{ form.status }}
-            <div class="text-danger small">{{ form.status.errors }}</div>
-        </div>
-    </div>
-
-    <button type="submit" class="btn text-white fw-bold px-4 py-2 w-100" style="background-color: var(--ruby); border-radius: 8px;">
-        <i class="fas fa-paper-plane me-2"></i> Publish Job Drive
-    </button>
-</form>
-                        </div>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-top border-5" style="border-top-color: var(--ruby) !important;">
+            <div class="card-body p-4 p-lg-5">
+                
+                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; color: var(--ruby); font-size: 1.5rem;">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Job Details</h5>
+                        <small class="text-muted">Fill in the requirements for the new drive.</small>
                     </div>
                 </div>
 
-                <div class="col-lg-4 d-none d-lg-block">
-                    <div class="card bg-light border-0 p-4">
-                        <h6 class="fw-bold" style="color: var(--han-purple);"><i class="fas fa-lightbulb me-2" style="color: var(--maximum-yellow);"></i> Quick Tips</h6>
-                        <ul class="text-muted small ps-3 mt-3 mb-0" style="line-height: 1.8;">
-                            <li>Be specific about the required tech stack.</li>
-                            <li>Clearly state if there is a service agreement or bond.</li>
-                            <li>Drives are visible to students immediately upon publishing.</li>
-                        </ul>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-container">
+                        {{ form.as_p }}
                     </div>
-                </div>
-            </div>
 
+                    <div class="d-flex gap-3 pt-3">
+                        <button type="submit" class="btn btn-primary-custom flex-fill">Publish JD</button>
+                        <a href="{% url 'hr_dashboard' %}" class="btn btn-outline-custom text-center" style="min-width: 120px;">Cancel</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 d-none d-lg-block">
+        <div class="card bg-light border-0 p-4">
+            <h6 class="fw-bold" style="color: var(--han-purple);"><i class="fas fa-lightbulb me-2" style="color: var(--maximum-yellow);"></i> Quick Tips</h6>
+            <ul class="text-muted small ps-3 mt-3 mb-0" style="line-height: 1.8;">
+                <li>Be specific about the required tech stack.</li>
+                <li>Clearly state if there is a service agreement or bond.</li>
+                <li>Drives are visible to students immediately upon publishing.</li>
+            </ul>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

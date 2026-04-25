@@ -1,154 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Candidate Status | CareerFlow</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --han-purple: #5D3FD3;
-            --midnight-blue: #1A1A2E;
-            --ruby: #E0115F;
-            --glass: rgba(255, 255, 255, 0.9);
-        }
-        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
-        .sidebar { background: var(--midnight-blue); min-height: 100vh; color: white; transition: all 0.3s; }
-        .nav-link { color: rgba(255,255,255,0.7); padding: 12px 20px; border-radius: 8px; margin: 4px 15px; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; }
-        .card { border-radius: 12px; border: none; }
-        .form-control:focus, .form-select:focus { border-color: var(--ruby); box-shadow: 0 0 0 0.25  rem rgba(224, 17, 95, 0.1); }
-    </style>
-</head>
-<body>
+{% extends 'portal/base_hr.html' %}
+{% block title %}Update Status | CareerFlow{% endblock %}
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-3 col-lg-2 p-0 sidebar shadow">
-            <div class="p-4 mb-4">
-                <h4 class="fw-bold m-0 text-white"><i class="fas fa-rocket me-2 text-ruby"></i>CareerFlow</h4>
-                <small class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Admin Suite</small>
+{% block extra_css %}
+<style>
+    /* Styling specifically for the Django forms on this page */
+    form select, form textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        background-color: #f8f9fa;
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+    form select:focus, form textarea:focus {
+        border-color: var(--middle-blue);
+        background-color: var(--white);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(126, 212, 230, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a href="{% url 'hr_dashboard' %}" class="text-decoration-none" style="color: var(--ruby);">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'hr_candidates' application.job.id %}" class="text-decoration-none" style="color: var(--ruby);">Candidates</a></li>
+            <li class="breadcrumb-item active">Update Status</li>
+        </ol>
+    </nav>
+    <h3 class="fw-bold mb-0 text-dark">Review Candidate</h3>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm h-100 overflow-hidden">
+            <div class="card-header bg-white py-3 border-0">
+                <h6 class="fw-bold m-0 text-muted small text-uppercase">Student Details</h6>
             </div>
-            
-            <div class="nav flex-column">
-                <div class="px-4 mb-3 text-muted small fw-bold text-uppercase">Recruiter Portal</div>
-                <a href="{% url 'hr_dashboard' %}" class="nav-link">
-                    <i class="fas fa-chart-line me-2"></i> Dashboard
-                </a>
-                <a href="{% url 'post_job' %}" class="nav-link">
-                    <i class="fas fa-plus-circle me-2"></i> Post JD
-                </a>
-                <a href="#" class="nav-link active">
-                    <i class="fas fa-user-check me-2"></i> Update Status
-                </a>
+            <div class="card-body text-center p-4">
                 
-                <hr class="mx-3 my-4 opacity-25">
-                <a href="{% url 'logout' %}" class="nav-link text-danger">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                </a>
-            </div>
-        </div>
-
-        <div class="col-md-9 col-lg-10 p-4">
-            
-            <div class="mb-4">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-1 small">
-                        <li class="breadcrumb-item"><a href="{% url 'hr_dashboard' %}" class="text-decoration-none" style="color: var(--ruby);">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'hr_candidates' application.job.id %}" class="text-decoration-none" style="color: var(--ruby);">Candidates</a></li>
-                        <li class="breadcrumb-item active">Update Status</li>
-                    </ol>
-                </nav>
-                <h2 class="fw-bold mb-0" style="color: var(--midnight-blue);">Review Candidate</h2>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <div class="card shadow-sm h-100 overflow-hidden">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h6 class="fw-bold m-0 text-muted small text-uppercase">Student Details</h6>
-                        </div>
-                        <div class="card-body text-center p-4">
-                            <div class="mx-auto mb-3 text-white d-flex align-items-center justify-content-center shadow-sm" 
-                                 style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, var(--han-purple), #8a2be2); font-size: 2.5rem; font-weight: bold;">
-                                {{ application.student.user.first_name|first|upper }}
-                            </div>
-                            
-                            <h4 class="fw-bold mb-1">{{ application.student.user.get_full_name }}</h4>
-                            <p class="text-muted mb-3">{{ application.student.branch }} | {{ application.student.gpa }} CGPA</p>
-                            
-                            <div class="d-flex justify-content-center gap-2 mb-4">
-                                <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-envelope me-1"></i> Email</span>
-                                <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-phone me-1"></i> Phone</span>
-                            </div>
-
-                            <hr class="opacity-10 my-4">
-                            
-                            <div class="text-start">
-                                <label class="small text-muted fw-bold text-uppercase d-block mb-1">Applying For</label>
-                                <p class="fw-bold mb-3">{{ application.job.title }}</p>
-                                
-                                <label class="small text-muted fw-bold text-uppercase d-block mb-1">Applied Date</label>
-                                <p class="mb-4">{{ application.applied_at|date:"F d, Y" }}</p>
-                                
-                                {% if application.student.resume %}
-                                    <a href="{{ application.student.resume.url }}" target="_blank" class="btn btn-outline-dark w-100 fw-bold">
-                                        <i class="fas fa-file-pdf me-2 text-danger"></i> View PDF Resume
-                                    </a>
-                                {% else %}
-                                    <div class="alert alert-warning py-2 small m-0"><i class="fas fa-exclamation-triangle me-1"></i> No resume uploaded.</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+                <div class="mx-auto mb-3 text-white d-flex align-items-center justify-content-center shadow-sm" 
+                     style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, var(--han-purple), #8a2be2); font-size: 2.5rem; font-weight: bold;">
+                    {{ application.student.user.first_name|first|upper|default:"S" }}
+                </div>
+                
+                <h4 class="fw-bold mb-1">{{ application.student.user.get_full_name|default:application.student.user.username }}</h4>
+                <p class="text-muted mb-3">{{ application.student.branch|default:"No Branch" }} | {{ application.student.gpa|default:"0.0" }} CGPA</p>
+                
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-envelope me-1"></i> {{ application.student.user.email }}</span>
                 </div>
 
-                <div class="col-lg-8 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-white py-3 border-0">
-                            <h6 class="fw-bold m-0 text-muted small text-uppercase">Selection Management</h6>
-                        </div>
-                        <div class="card-body p-4 pt-0">
-                            <form method="POST">
-                                {% csrf_token %}
-                                
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-muted small text-uppercase">Current Selection Stage</label>
-                                    {{ form.stage }}
-                                    <div class="form-text small">Move the candidate through the placement funnel.</div>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-muted small text-uppercase">HR Remarks / Interview Feedback</label>
-                                    {{ form.notes }}
-                                    <div class="form-text small">These notes will be visible to the student on their "My Status" page.</div>
-                                </div>
-
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn text-white fw-bold px-5 py-2" style="background-color: var(--ruby); border-radius: 8px;">
-                                        <i class="fas fa-save me-2"></i> Update Application
-                                    </button>
-                                    <a href="{% url 'hr_candidates' application.job.id %}" class="btn btn-light border px-4 py-2">
-                                        Cancel
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 p-3 bg-white rounded shadow-sm border-start border-4 border-info">
-                        <p class="small text-muted m-0">
-                            <i class="fas fa-info-circle me-2 text-info"></i> 
-                            <strong>Note:</strong> Updating the stage will automatically trigger a notification to the student's dashboard.
-                        </p>
-                    </div>
+                <hr class="opacity-10 my-4">
+                
+                <div class="text-start">
+                    <label class="small text-muted fw-bold text-uppercase d-block mb-1">Applying For</label>
+                    <p class="fw-bold mb-3">{{ application.job.title }}</p>
+                    
+                    <label class="small text-muted fw-bold text-uppercase d-block mb-1">Applied Date</label>
+                    <p class="mb-4">{{ application.created_at|date:"F d, Y" }}</p>
+                    
+                    {% if application.student.resume %}
+                        <a href="{{ application.student.resume.url }}" target="_blank" class="btn btn-outline-dark w-100 fw-bold" style="border-radius: 8px;">
+                            <i class="fas fa-file-pdf me-2 text-danger"></i> View PDF Resume
+                        </a>
+                    {% else %}
+                        <div class="alert alert-warning py-2 small m-0 rounded-3"><i class="fas fa-exclamation-triangle me-1"></i> No resume uploaded.</div>
+                    {% endif %}
                 </div>
+                
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3 border-0">
+                <h6 class="fw-bold m-0 text-muted small text-uppercase">Selection Management</h6>
+            </div>
+            <div class="card-body p-4 pt-0">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase">Current Selection Stage</label>
+                        {{ form.stage }}
+                        <div class="form-text small">Move the candidate through the placement funnel.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase">HR Remarks / Interview Feedback</label>
+                        {% if form.notes %}
+                            {{ form.notes }}
+                        {% else %}
+                            <textarea name="notes" rows="4" placeholder="Enter feedback here..."></textarea>
+                        {% endif %}
+                        <div class="form-text small">These notes will be visible to the student on their "My Status" page.</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn text-white fw-bold px-5 py-2" style="background-color: var(--ruby); border-radius: 8px; transition: 0.3s;">
+                            <i class="fas fa-save me-2"></i> Update Application
+                        </button>
+                        <a href="{% url 'hr_candidates' application.job.id %}" class="btn btn-light border px-4 py-2" style="border-radius: 8px;">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-4 p-3 bg-white rounded shadow-sm border-start border-4" style="border-left-color: var(--middle-blue) !important;">
+            <p class="small text-muted m-0">
+                <i class="fas fa-info-circle me-2" style="color: var(--middle-blue);"></i> 
+                <strong>Note:</strong> Updating the stage will automatically trigger a notification to the student's dashboard.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,296 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Candidates | CareerFlow</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --han-purple: #5218FA;
-            --kobi: #E79FC4;
-            --maximum-yellow: #FAEF32;
-            --middle-blue: #7ED4E6;
-            --ruby: #E0115F;
-            --white: #FFFFFF;
-            --bg-light: #F8F9FB; 
-        }
+{% extends 'portal/base_hr.html' %}
+{% block title %}Manage Candidates | CareerFlow{% endblock %}
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-light);
-            color: #2d3436;
-        }
+{% block extra_css %}
+<style>
+    .header-title { color: var(--han-purple); font-weight: 800; font-size: 1.4rem; }
+    .badge-stage { padding: 6px 12px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; font-size: 11px; }
+    .bg-primary-custom { background-color: rgba(82, 24, 250, 0.1); color: var(--han-purple); border: 1px solid var(--han-purple); }
+    .bg-success-custom { background-color: rgba(126, 212, 230, 0.2); color: #0d5c6b; border: 1px solid var(--middle-blue); }
+    .bg-danger-custom { background-color: rgba(224, 17, 95, 0.1); color: var(--ruby); border: 1px solid var(--ruby); }
+    .btn-outline-update { color: var(--han-purple); border: 1px solid var(--han-purple); background: transparent; }
+    .btn-outline-update:hover { background: var(--han-purple); color: white; }
+</style>
+{% endblock %}
 
-        /* --- Sidebar Navigation --- */
-        .sidebar {
-            background-color: var(--white);
-            min-height: 100vh;
-            border-right: 2px solid rgba(126, 212, 230, 0.2);
-            padding-top: 20px;
-        }
-        .sidebar-brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--han-purple);
-            text-decoration: none;
-            padding: 0 20px;
-            display: block;
-            margin-bottom: 30px;
-        }
-        .sidebar-brand span { color: var(--ruby); }
-        
-        .nav-link {
-            color: #6c757d;
-            font-weight: 500;
-            padding: 12px 25px;
-            margin: 5px 15px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        .nav-link:hover {
-            color: var(--han-purple);
-            background-color: rgba(82, 24, 250, 0.05);
-        }
-        .nav-link.active {
-            background-color: var(--han-purple);
-            color: var(--white);
-            box-shadow: 0 4px 10px rgba(82, 24, 250, 0.3);
-        }
-
-        /* --- Cards & UI Elements --- */
-        .card {
-            border: none;
-            background-color: var(--white);
-            border-radius: 16px !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-
-        .header-title {
-            color: var(--han-purple);
-            font-weight: 800;
-            font-size: 1.4rem;
-        }
-
-        /* --- Tables --- */
-        .table {
-            vertical-align: middle;
-            margin-bottom: 0;
-        }
-        .table thead th {
-            background-color: var(--bg-light);
-            color: var(--han-purple);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: none;
-            padding: 15px;
-            font-weight: 700;
-        }
-        .table tbody td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        .table-hover tbody tr:hover {
-            background-color: rgba(126, 212, 230, 0.05); /* Very light Middle Blue */
-        }
-
-        /* --- Badges --- */
-        .badge-stage {
-            padding: 6px 12px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            font-size: 11px;
-        }
-        /* Mapped to your Django Logic */
-        .bg-primary-custom { background-color: rgba(82, 24, 250, 0.1); color: var(--han-purple); border: 1px solid var(--han-purple); }
-        .bg-success-custom { background-color: rgba(126, 212, 230, 0.2); color: #0d5c6b; border: 1px solid var(--middle-blue); }
-        .bg-danger-custom { background-color: rgba(224, 17, 95, 0.1); color: var(--ruby); border: 1px solid var(--ruby); }
-
-        /* --- Buttons --- */
-        .btn-primary-custom {
-            background-color: var(--han-purple);
-            color: white;
-            border: none;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: 0.3s;
-            padding: 8px 16px;
-        }
-        .btn-primary-custom:hover {
-            background-color: var(--ruby);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(224, 17, 95, 0.2);
-        }
-
-        .btn-action {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-        .btn-outline-update {
-            color: var(--han-purple);
-            border: 1px solid var(--han-purple);
-            background: transparent;
-        }
-        .btn-outline-update:hover { background: var(--han-purple); color: white; }
-        
-        .btn-outline-cv {
-            color: #0d5c6b;
-            border: 1px solid var(--middle-blue);
-            background: rgba(126, 212, 230, 0.1);
-        }
-        .btn-outline-cv:hover { background: var(--middle-blue); color: white; }
-    </style>
-</head>
-<body>
-
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
-    <a href="{% url 'home' %}" class="sidebar-brand">
-        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
-    </a>
-    
-    <div class="d-flex flex-column">
-        <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Recruiter Portal</div>
-        
-        <a href="{% url 'hr_dashboard' %}" class="nav-link">
-            <i class="fas fa-chart-line me-2"></i> Dashboard
-        </a>
-        
-        <a href="{% url 'post_job' %}" class="nav-link">
-            <i class="fas fa-plus-circle me-2"></i> Post JD
-        </a>
-        
-        
-        <hr class="mx-3 my-4 opacity-25">
-        
-        <a href="{% url 'login' %}" class="nav-link text-danger">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </a>
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div class="mb-3 mb-md-0">
+        <a href="{% url 'hr_dashboard' %}" class="text-muted text-decoration-none small fw-semibold mb-2 d-inline-block"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
+        <div class="d-flex align-items-center gap-3 mt-2">
+            <div class="bg-white shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; color: var(--ruby);">
+                <i class="fas fa-building fs-5"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 header-title">{{ job.company.company_name }} <span class="text-dark fw-medium">— {{ job.title }}</span></h6>
+                <div class="text-muted small mt-1" style="font-weight: 500;">
+                    <i class="fas fa-rupee-sign me-1" style="color: var(--kobi)"></i> {{ job.package|default:"-" }} LPA 
+                    <span class="mx-2">•</span> 
+                    <i class="far fa-calendar-alt me-1" style="color: var(--middle-blue)"></i> Drive: {{ job.created_at|date:"d M Y" }}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-        <div class="col-md-9 col-lg-10 p-4">
-    
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1 small">
-                    <li class="breadcrumb-item"><a href="{% url 'hr_dashboard' %}" class="text-decoration-none" style="color: var(--ruby);">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Candidates</li>
-                </ol>
-            </nav>
-            <h2 class="fw-bold mb-0" style="color: var(--midnight-blue);">Applicants for {{ job.title }}</h2>
-            <p class="text-muted mt-1 mb-0">
-                <i class="fas fa-users me-1"></i> Total Applications: <strong>{{ applications.count }}</strong>
-                <span class="mx-2">|</span>
-                <i class="fas fa-graduation-cap me-1"></i> Min CGPA Required: <strong>{{ job.min_gpa }}</strong>
-            </p>
-        </div>
-        <a href="{% url 'hr_dashboard' %}" class="btn btn-outline-secondary shadow-sm">
-            <i class="fas fa-arrow-left me-2"></i> Back to Jobs
-        </a>
-    </div>
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                <i class="fas fa-check-circle me-2"></i> {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-muted small text-uppercase">
-                        <tr>
-                            <th class="ps-4 py-3">Student Name</th>
-                            <th>Branch & CGPA</th>
-                            <th>Resume</th>
-                            <th>Applied On</th>
-                            <th>Current Stage</th>
-                            <th class="pe-4 text-end">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for app in applications %}
-                        <tr>
-                            <td class="ps-4">
-                                <div class="fw-bold text-dark">{{ app.student.user.first_name }} {{ app.student.user.last_name }}</div>
-                                <div class="small text-muted">{{ app.student.user.email }}</div>
-                            </td>
-                            <td>
-                                <div>{{ app.student.branch }}</div>
-                                <div class="small fw-bold {% if app.student.gpa >= job.min_gpa %}text-success{% else %}text-danger{% endif %}">
-                                    {{ app.student.gpa }} CGPA
+<div class="card border-top border-5" style="border-top-color: var(--middle-blue) !important;">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Applicant Name</th>
+                        <th>Roll No</th>
+                        <th>Branch</th>
+                        <th>GPA</th>
+                        <th>Current Stage</th>
+                        <th>Applied On</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center fw-bold me-3" style="width:32px; height:32px; color: var(--han-purple); font-size: 12px;">
+                                    {{ app.student.user.first_name|first|upper|default:"S" }}{{ app.student.user.last_name|first|upper }}
                                 </div>
-                            </td>
-                            <td>
-                                {% if app.student.resume %}
-                                    <a href="{{ app.student.resume.url }}" target="_blank" class="btn btn-sm btn-light border text-primary">
-                                        <i class="fas fa-file-pdf me-1"></i> View PDF
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted small fst-italic">Missing</span>
-                                {% endif %}
-                            </td>
-                            <td class="small">{{ app.applied_on|date:"M d, Y" }}</td>
-                            <td>
-                                {% if app.stage == 'applied' %}
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">New Applicant</span>
-                                {% elif app.stage == 'shortlisted' %}
-                                    <span class="badge bg-info bg-opacity-10 text-info">Shortlisted</span>
-                                {% elif app.stage == 'interview' %}
-                                    <span class="badge bg-primary bg-opacity-10 text-primary">Interviewing</span>
-                                {% elif app.stage == 'selected' %}
-                                    <span class="badge bg-success bg-opacity-10 text-success">Selected</span>
-                                {% elif app.stage == 'rejected' %}
-                                    <span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
-                                {% else %}
-                                    <span class="badge bg-light text-dark border">{{ app.get_stage_display }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="pe-4 text-end">
-                                <a href="{% url 'update_application_status' app.id %}" class="btn btn-sm text-white px-3" style="background-color: var(--ruby);">
-                                    Update Status <i class="fas fa-edit ms-1"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="fas fa-users-slash mb-3" style="font-size: 2.5rem; color: #cbd5e1;"></i>
-                                <h5>No candidates yet</h5>
-                                <p class="small mb-0">Students haven't started applying to this drive yet.</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                                <strong>{{ app.student.user.get_full_name|default:app.student.user.username }}</strong>
+                            </div>
+                        </td>
+                        <td class="text-muted">{{ app.student.roll_number|default:"-" }}</td>
+                        <td><span class="fw-medium text-dark">{{ app.student.branch|default:"-" }}</span></td>
+                        <td><strong style="color: var(--han-purple);">{{ app.student.gpa|default:"0.0" }}</strong></td>
+                        <td>
+                            {% if app.stage == 'placed' %}
+                                <span class="badge badge-stage bg-success-custom rounded-pill"><i class="fas fa-star text-warning me-1"></i> Placed</span>
+                            {% elif app.stage == 'rejected' %}
+                                <span class="badge badge-stage bg-danger-custom rounded-pill">Rejected</span>
+                            {% else %}
+                                <span class="badge badge-stage bg-primary-custom rounded-pill">{{ app.get_stage_display|default:app.stage }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">{{ app.created_at|date:"d M Y" }}</td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'update_application_status' pk=app.id %}" class="btn btn-sm btn-outline-custom me-1" style="padding: 6px 12px; font-size: 12px;">Update Status</a>                
+                            
+                            {% if app.student.resume %}
+                                <a href="{{ app.student.resume.url }}" target="_blank" class="btn btn-action btn-outline-cv" title="View CV"><i class="fas fa-file-pdf"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted fst-italic">No candidates have applied to this role yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'portal/base.html' %}
+
+{% block sidebar %}
+<a href="{% url 'home' %}" class="sidebar-brand">
+    <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
+</a>
+
+<div class="d-flex flex-column">
+    <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Recruiter Portal</div>
+    
+    <a href="{% url 'hr_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'hr_dashboard' %}active{% endif %}">
+        <i class="fas fa-chart-line me-2"></i> Dashboard
+    </a>
+    
+    <a href="{% url 'post_job' %}" class="nav-link {% if request.resolver_match.url_name == 'post_job' %}active{% endif %}">
+        <i class="fas fa-plus-circle me-2"></i> Post JD
+    </a>
+    
+    <hr class="mx-3 my-4 opacity-25">
+    
+    <a href="{% url 'logout' %}" class="nav-link text-danger">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+    </a>
+</div>
+{% endblock %}

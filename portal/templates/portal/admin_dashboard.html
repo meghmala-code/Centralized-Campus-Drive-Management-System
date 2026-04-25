@@ -1,342 +1,149 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | CareerFlow</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --han-purple: #5218FA;
-            --kobi: #E79FC4;
-            --maximum-yellow: #FAEF32;
-            --middle-blue: #7ED4E6;
-            --ruby: #E0115F;
-            --white: #FFFFFF;
-            --bg-light: #F8F9FB; 
-        }
+{% extends 'portal/base_admin.html' %}
+{% block title %}Admin Dashboard | CareerFlow{% endblock %}
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-light);
-            color: #2d3436;
-        }
-
-        /* --- Sidebar Navigation --- */
-        .sidebar {
-            background-color: var(--white);
-            min-height: 100vh;
-            border-right: 2px solid rgba(126, 212, 230, 0.2);
-            padding-top: 20px;
-        }
-        .sidebar-brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--han-purple);
-            text-decoration: none;
-            padding: 0 20px;
-            display: block;
-            margin-bottom: 30px;
-        }
-        .sidebar-brand span { color: var(--ruby); }
-        
-        .nav-link {
-            color: #6c757d;
-            font-weight: 500;
-            padding: 12px 25px;
-            margin: 5px 15px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        .nav-link:hover {
-            color: var(--han-purple);
-            background-color: rgba(82, 24, 250, 0.05);
-        }
-        .nav-link.active {
-            background-color: var(--maximum-yellow); /* Admin theme switch */
-            color: #333;
-            box-shadow: 0 4px 10px rgba(250, 239, 50, 0.3);
-            font-weight: 700;
-        }
-
-        /* --- Dashboard Cards --- */
-        .card {
-            border: none;
-            background-color: var(--white);
-            border-radius: 16px !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-        
-        /* Metric Cards */
-        .metric-card {
-            padding: 20px;
-            border-radius: 16px;
-            background-color: var(--white);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            border-bottom: 4px solid var(--han-purple);
-            transition: transform 0.2s;
-            height: 100%;
-        }
-        .metric-card:hover { transform: translateY(-5px); }
-        .metric-card.card-ruby { border-bottom-color: var(--ruby); }
-        .metric-card.card-blue { border-bottom-color: var(--middle-blue); }
-        .metric-card.card-kobi { border-bottom-color: var(--kobi); }
-        .metric-card.card-yellow { border-bottom-color: var(--maximum-yellow); }
-        
-        .metric-card .lbl {
-            font-size: 13px;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 700;
-        }
-        .metric-card .val {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--han-purple);
-            margin-top: 5px;
-            line-height: 1.1;
-        }
-
-        /* --- Tables --- */
-        .table {
-            vertical-align: middle;
-            margin-bottom: 0;
-        }
-        .table thead th {
-            background-color: var(--bg-light);
-            color: #6c757d;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: none;
-            padding: 15px;
-        }
-        .table tbody td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        
-        /* --- Badges --- */
-        .badge-status {
-            padding: 6px 12px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            font-size: 11px;
-        }
-        .bg-active { background-color: rgba(126, 212, 230, 0.2); color: #0d5c6b; border: 1px solid var(--middle-blue); }
-        .bg-draft { background-color: rgba(250, 239, 50, 0.2); color: #857b0a; border: 1px solid var(--maximum-yellow); }
-        .bg-closed { background-color: #f1f3f5; color: #6c757d; border: 1px solid #dee2e6; }
-
-        /* --- Progress Bars --- */
-        .progress {
-            background-color: rgba(126, 212, 230, 0.15);
-            border-radius: 50px;
-        }
-        .bg-purple-bar { background-color: var(--han-purple); }
-        .bg-blue-bar { background-color: var(--middle-blue); }
-        .bg-ruby-bar { background-color: var(--ruby); }
-        .bg-kobi-bar { background-color: var(--kobi); }
-
-    </style>
-</head>
-<body>
-
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
-    <a href="{% url 'home' %}" class="sidebar-brand">
-        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
-    </a>
-    
-    <div class="d-flex flex-column">
-        <div class="px-4 mb-3" style="font-size: 12px; font-weight: 800; color: var(--han-purple); text-transform: uppercase; letter-spacing: 0.05em;">Admin Portal</div>
-        
-        <a href="{% url 'admin_dashboard' %}" class="nav-link active">
-            <i class="fas fa-chart-line me-2"></i> Dashboard
-        </a>
-        
-        <a href="{% url 'admin_students' %}" class="nav-link">
-            <i class="fas fa-user-graduate me-2"></i> Students
-        </a>
-        
-        <a href="{% url 'admin_companies' %}" class="nav-link">
-            <i class="fas fa-building me-2"></i> Companies
-        </a>
-
-        
-        <a href="{% url 'admin_reports' %}" class="nav-link">
-            <i class="fas fa-chart-pie me-2"></i> Reports
-        </a>
-        
-        <hr class="mx-3 my-4 opacity-25">
-        
-        <a href="/admin/" class="nav-link text-secondary" target="_blank">
-            <i class="fas fa-cog me-2"></i> Django Admin
-        </a>
-        
-        <a href="{% url 'logout' %}" class="nav-link text-danger">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </a>
-    </div>
-</div>
-
-        <div class="col-md-9 col-lg-10 p-4 p-md-5">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h3 class="fw-bold mb-0 text-dark">System Overview</h3>
-                    <p class="text-muted small">Placement Cell Administration Dashboard.</p>
-                </div>
-            </div>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-3">
-                    <div class="metric-card card-purple">
-                        <div class="lbl">Total Students</div>
-                        <div class="val">1,245</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="metric-card card-kobi">
-                        <div class="lbl">Partner Companies</div>
-                        <div class="val" style="color: var(--kobi)">86</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="metric-card card-blue">
-                        <div class="lbl">Total Placed</div>
-                        <div class="val" style="color: var(--middle-blue)">890</div>
-                        <small class="text-muted fw-semibold mt-1 d-block" style="font-size: 12px;">71.4% Placed</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="metric-card card-yellow">
-                        <div class="lbl">Active Drives</div>
-                        <div class="val" style="color: #857b0a">14</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-lg-7">
-                    <div class="card h-100 border-top border-5" style="border-top-color: var(--ruby) !important;">
-                        <div class="card-body p-0">
-                            <div class="p-4 border-bottom">
-                                <h5 class="fw-bold mb-0 text-dark">Recent Job Drives</h5>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th class="ps-4">Company</th>
-                                            <th>Role</th>
-                                            <th>Package</th>
-                                            <th>Status</th>
-                                            <th class="pe-4">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="ps-4"><strong style="color: var(--han-purple);">Google</strong></td>
-                                            <td>Software Engineer</td>
-                                            <td><strong style="color: #0d5c6b;">32.0 LPA</strong></td>
-                                            <td><span class="badge badge-status bg-active rounded-pill">Active</span></td>
-                                            <td class="text-muted pe-4 small">20 May 2026</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-4"><strong style="color: var(--han-purple);">Microsoft</strong></td>
-                                            <td>Cloud Architect</td>
-                                            <td><strong style="color: #0d5c6b;">45.0 LPA</strong></td>
-                                            <td><span class="badge badge-status bg-active rounded-pill">Active</span></td>
-                                            <td class="text-muted pe-4 small">22 May 2026</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-4"><strong style="color: #6c757d;">TCS</strong></td>
-                                            <td>Ninja Developer</td>
-                                            <td><strong style="color: #6c757d;">3.5 LPA</strong></td>
-                                            <td><span class="badge badge-status bg-closed rounded-pill">Closed</span></td>
-                                            <td class="text-muted pe-4 small">10 Apr 2026</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-4"><strong style="color: var(--han-purple);">Amazon</strong></td>
-                                            <td>Frontend Dev</td>
-                                            <td><strong style="color: #857b0a;">24.0 LPA</strong></td>
-                                            <td><span class="badge badge-status bg-draft rounded-pill">Draft</span></td>
-                                            <td class="text-muted pe-4 small">TBD</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-5">
-                    <div class="card h-100 border-top border-5" style="border-top-color: var(--middle-blue) !important;">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-4 text-dark">Placement by Branch</h5>
-                            
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
-                                    <span>Computer Science (CSE)</span>
-                                    <span style="color: var(--han-purple);">92%</span>
-                                </div>
-                                <div class="progress" style="height:10px">
-                                    <div class="progress-bar bg-purple-bar" style="width: 92%"></div>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
-                                    <span>Information Science (ISE)</span>
-                                    <span style="color: var(--middle-blue);">85%</span>
-                                </div>
-                                <div class="progress" style="height:10px">
-                                    <div class="progress-bar bg-blue-bar" style="width: 85%"></div>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
-                                    <span>Electronics (ECE)</span>
-                                    <span style="color: var(--ruby);">78%</span>
-                                </div>
-                                <div class="progress" style="height:10px">
-                                    <div class="progress-bar bg-ruby-bar" style="width: 78%"></div>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
-                                    <span>Mechanical (ME)</span>
-                                    <span style="color: var(--kobi);">45%</span>
-                                </div>
-                                <div class="progress" style="height:10px">
-                                    <div class="progress-bar bg-kobi-bar" style="width: 45%"></div>
-                                </div>
-                            </div>
-
-                            <div class="mt-5 text-center">
-                                <button class="btn btn-sm btn-outline-secondary rounded-pill px-4">View Detailed Report</button>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0 text-dark">System Overview</h3>
+            <p class="text-muted small">Placement Cell Administration Dashboard.</p>
         </div>
     </div>
-</div>
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="lbl">Total Students</div>
+                <div class="val">{{ total_students|default:"0" }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card card-kobi">
+                <div class="lbl">Partner Companies</div>
+                <div class="val" style="color: var(--kobi)">{{ total_companies|default:"0" }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card card-blue">
+                <div class="lbl">Total Placed</div>
+                <div class="val" style="color: var(--middle-blue)">{{ total_placed|default:"0" }}</div>
+                <small class="text-muted fw-semibold mt-1 d-block" style="font-size: 12px;">{{ placement_perc|default:"0"|floatformat:1 }}% Placed</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card card-yellow">
+                <div class="lbl">Active Drives</div>
+                <div class="val" style="color: #857b0a">{{ active_drives|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <div class="row g-4">
+        
+        <div class="col-lg-7">
+            <div class="card h-100 border-top border-5" style="border-top-color: var(--ruby) !important;">
+                <div class="card-body p-0">
+                    <div class="p-4 border-bottom">
+                        <h5 class="fw-bold mb-0 text-dark">Recent Job Drives</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Company</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th class="text-end pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in recent_jobs %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <strong style="color: var(--han-purple);">{{ job.company.company_name|default:"Company" }}</strong><br>
+                                        <small class="text-muted">{{ job.created_at|date:"d M Y" }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium text-dark">{{ job.title }}</span><br>
+                                        <small style="color: #0d5c6b; font-weight: 600;">{{ job.package|default:"-" }} LPA</small>
+                                    </td>
+                                    <td>
+                                        {% if job.status == 'active' %}
+                                            <span class="badge badge-status bg-active rounded-pill">Active</span>
+                                        {% elif job.status == 'closed' %}
+                                            <span class="badge badge-status bg-closed rounded-pill">Closed</span>
+                                        {% else %}
+                                            <span class="badge badge-status bg-draft rounded-pill">Draft</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{% url 'schedule_interview' job_pk=job.id %}" class="btn btn-sm btn-outline-primary" style="border-radius: 8px; font-weight: 600; padding: 6px 12px;">
+                                            <i class="fas fa-calendar-plus me-1"></i> Schedule
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted fst-italic">No recent job drives.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card h-100 border-top border-5" style="border-top-color: var(--middle-blue) !important;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4 text-dark">Placement by Branch</h5>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
+                            <span>Computer Science (CSE)</span>
+                            <span style="color: var(--han-purple);">92%</span>
+                        </div>
+                        <div class="progress" style="height:10px">
+                            <div class="progress-bar bg-purple-bar" style="width: 92%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
+                            <span>Information Science (ISE)</span>
+                            <span style="color: var(--middle-blue);">85%</span>
+                        </div>
+                        <div class="progress" style="height:10px">
+                            <div class="progress-bar bg-blue-bar" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
+                            <span>Electronics (ECE)</span>
+                            <span style="color: var(--ruby);">78%</span>
+                        </div>
+                        <div class="progress" style="height:10px">
+                            <div class="progress-bar bg-ruby-bar" style="width: 78%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:13px; font-weight: 600; color: #495057;">
+                            <span>Mechanical (ME)</span>
+                            <span style="color: var(--kobi);">45%</span>
+                        </div>
+                        <div class="progress" style="height:10px">
+                            <div class="progress-bar bg-kobi-bar" style="width: 45%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 text-center">
+                        <a href="{% url 'admin_reports' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-4">View Detailed Report</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

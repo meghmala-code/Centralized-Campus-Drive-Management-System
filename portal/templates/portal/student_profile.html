@@ -1,273 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | CareerFlow</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --han-purple: #5218FA;
-            --kobi: #E79FC4;
-            --maximum-yellow: #FAEF32;
-            --middle-blue: #7ED4E6;
-            --ruby: #E0115F;
-            --white: #FFFFFF;
-            --bg-light: #F8F9FB; 
-        }
+{% extends 'portal/base_student.html' %}
+{% block title %}My Profile | CareerFlow{% endblock %}
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-light);
-            color: #2d3436;
-        }
+{% block extra_css %}
+<style>
+    .avatar-circle { background: linear-gradient(135deg, var(--han-purple), var(--ruby)); box-shadow: 0 4px 10px rgba(82, 24, 250, 0.2); }
+    .skill-badge { background-color: rgba(126, 212, 230, 0.15); color: var(--han-purple); border: 1px solid var(--middle-blue); font-weight: 600; padding: 8px 15px; border-radius: 50px; }
+</style>
+{% endblock %}
 
-        /* --- Sidebar Navigation --- */
-        .sidebar {
-            background-color: var(--white);
-            min-height: 100vh;
-            border-right: 2px solid rgba(126, 212, 230, 0.2);
-            padding-top: 20px;
-        }
-        .sidebar-brand {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--han-purple);
-            text-decoration: none;
-            padding: 0 20px;
-            display: block;
-            margin-bottom: 30px;
-        }
-        .sidebar-brand span { color: var(--ruby); }
-        
-        .nav-link {
-            color: #6c757d;
-            font-weight: 500;
-            padding: 12px 25px;
-            margin: 5px 15px;
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-        .nav-link:hover {
-            color: var(--han-purple);
-            background-color: rgba(82, 24, 250, 0.05);
-        }
-        .nav-link.active {
-            background-color: var(--han-purple);
-            color: var(--white);
-            box-shadow: 0 4px 10px rgba(82, 24, 250, 0.3);
-        }
+{% block content %}
+<h3 class="fw-bold mb-4 text-dark">Profile Settings</h3>
 
-        /* --- Cards & General UI --- */
-        .card {
-            background-color: var(--white);
-            border-radius: 16px !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            border: none;
-        }
-        
-        .avatar-circle {
-            background: linear-gradient(135deg, var(--han-purple), var(--ruby));
-            box-shadow: 0 4px 10px rgba(82, 24, 250, 0.2);
-        }
-
-        /* --- Auto-styling for Django forms --- */
-        form input, form select, form textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid #f0f0f0;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
-        }
-
-        form input:focus, form select:focus, form textarea:focus {
-            border-color: var(--middle-blue);
-            background-color: var(--white);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(126, 212, 230, 0.15);
-        }
-
-        .form-label {
-            font-size: 12px;
-            color: var(--han-purple);
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            font-weight: 700;
-        }
-
-        /* --- Buttons & Badges --- */
-        .btn-primary {
-            background-color: var(--han-purple);
-            border: none;
-            padding: 12px;
-            font-weight: 700;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: var(--ruby);
-            transform: translateY(-2px);
-        }
-
-        .btn-outline-primary {
-            color: var(--han-purple);
-            border: 2px solid var(--han-purple);
-            font-weight: 600;
-            border-radius: 10px;
-        }
-        .btn-outline-primary:hover {
-            background-color: var(--han-purple);
-            color: var(--white);
-        }
-
-        .skill-badge {
-            background-color: rgba(126, 212, 230, 0.15);
-            color: var(--han-purple);
-            border: 1px solid var(--middle-blue);
-            font-weight: 600;
-            padding: 8px 15px;
-            border-radius: 50px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container-fluid p-0">
-    <div class="row g-0">
-        <div class="col-md-3 col-lg-2 d-none d-md-block sidebar shadow-sm">
-    <a href="{% url 'home' %}" class="sidebar-brand">
-        <i class="fas fa-bolt me-2"></i>Career<span>Flow</span>
-    </a>
-    
-    <div class="d-flex flex-column">
-        <div class="px-4 mb-3 text-muted" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Student Portal</div>
-        
-        <a href="{% url 'student_dashboard' %}" class="nav-link">
-            <i class="fas fa-th-large me-2"></i> Dashboard
-        </a>
-        
-        <a href="{% url 'student_profile' %}" class="nav-link active">
-            <i class="fas fa-user me-2"></i> My Profile
-        </a>
-        
-        <a href="{% url 'drives_list' %}" class="nav-link">
-            <i class="fas fa-briefcase me-2"></i> Browse Drives
-        </a>
-        
-        <a href="{% url 'my_status' %}" class="nav-link">
-            <i class="fas fa-clipboard-check me-2"></i> My Status
-        </a>
-        
-        <hr class="mx-3 my-4 opacity-25">
-        
-        <a href="{% url 'logout' %}" class="nav-link text-danger">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </a>
-    </div>
-</div>
-        <div class="col-md-9 col-lg-10 p-4">
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-                <i class="fas fa-check-circle me-2"></i> {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="card shadow-sm border-0 mb-4 bg-white" style="border-top: 4px solid var(--han-purple); border-radius: 12px;">
-        <div class="card-body p-4 d-flex align-items-center">
-            <div class="me-4 text-white d-flex align-items-center justify-content-center shadow-sm" 
-                 style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--han-purple); font-size: 2.5rem; font-weight: bold;">
-                {{ request.user.first_name|first|upper }}
-            </div>
-            <div>
-                <h2 class="fw-bold mb-1" style="color: var(--midnight-blue);">
-                    {{ request.user.first_name }} {{ request.user.last_name }}
-                </h2>
-                <p class="text-muted mb-2 fw-medium">
-                    <i class="fas fa-id-badge me-2"></i> {{ request.user.username }} 
-                </p>
-                <div class="d-flex flex-wrap gap-2 mt-2">
-                    <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-envelope me-1 text-muted"></i> {{ request.user.email }}</span>
-                    {% if profile.branch %}
-                        <span class="badge bg-light text-dark border px-2 py-1"><i class="fas fa-graduation-cap me-1 text-muted"></i> {{ profile.branch }}</span>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0" style="border-radius: 12px;">
-        <div class="card-body p-4">
-            <h5 class="fw-bold mb-4 pb-2 border-bottom" style="color: var(--midnight-blue);">Update Academic Details</h5>
-            
-            <form method="POST" action="{% url 'student_profile' %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger p-2 small">{{ form.non_field_errors }}</div>
-                {% endif %}
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted small fw-bold text-uppercase">Phone Number</label>
-                        {{ form.phone }}
-                        <div class="text-danger small">{{ form.phone.errors }}</div>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card p-2">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-4 mb-5 pb-4 border-bottom">
+                    <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:70px; height:70px; font-size:24px">
+                        {{ profile.user.first_name|first|upper|default:"S" }}{{ profile.user.last_name|first|upper }}
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted small fw-bold text-uppercase">Current CGPA</label>
-                        {{ form.gpa }}
-                        <div class="text-danger small">{{ form.gpa.errors }}</div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted small fw-bold text-uppercase">Branch / Department</label>
-                        {{ form.branch }}
-                        <div class="text-danger small">{{ form.branch.errors }}</div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted small fw-bold text-uppercase">Graduation Year</label>
-                        {{ form.year_of_passing }}
-                        <div class="text-danger small">{{ form.year_of_passing.errors }}</div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold text-uppercase">Technical Skills</label>
-                    {{ form.skills }}
-                    <div class="text-danger small">{{ form.skills.errors }}</div>
-                    <div class="form-text small mt-1">Separate skills with a comma (e.g., Python, SQL, React)</div>
-                </div>
-
-                <div class="mb-4 pt-2">
-                    <label class="form-label text-muted small fw-bold text-uppercase">Upload Resume (PDF)</label>
-                    {% if profile.resume %}
-                        <div class="mb-2 small">
-                            <span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Current Resume:</span> 
-                            <a href="{{ profile.resume.url }}" target="_blank" class="text-decoration-none">View File</a>
+                    <div>
+                        <div class="fw-bold fs-4 text-dark">{{ profile.user.get_full_name|default:profile.user.username }}</div>
+                        <div class="text-muted" style="font-weight: 500;">
+                            <i class="fas fa-id-card me-1" style="color: var(--kobi)"></i> {{ profile.roll_number|default:"No Roll No" }} <span class="mx-2">•</span> 
+                            <i class="fas fa-laptop-code me-1" style="color: var(--middle-blue)"></i> {{ profile.branch|default:"Branch Not Set" }}
                         </div>
-                    {% endif %}
-                    {{ form.resume }}
-                    <div class="text-danger small">{{ form.resume.errors }}</div>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn text-white fw-bold px-4 py-2" style="background-color: var(--han-purple); border-radius: 8px;">
-                    <i class="fas fa-save me-2"></i> Save Profile Details
-                </button>
-            </form>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        {{ form.as_p }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-custom w-100 mt-2" style="background-color: var(--han-purple); color: white; padding: 12px; border-radius: 10px; font-weight: bold; border: none;">Save Profile Updates</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <div class="col-lg-5">
+        
+        <div class="card mb-4 p-2 border-top border-5" style="border-top-color: var(--kobi) !important;">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark">Technical Skills</h5>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <span class="badge skill-badge">Java</span>
+                    <span class="badge skill-badge">Data Structures</span>
+                    <span class="badge skill-badge">Competitive Programming</span>
+                    <span class="badge skill-badge">Python</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card p-2 border-top border-5" style="border-top-color: var(--middle-blue) !important;">
+            <div class="card-body p-4 text-center">
+                <div class="mb-3">
+                    <i class="fas fa-file-pdf" style="font-size: 3rem; color: var(--ruby);"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">Current Resume</h5>
+                
+                {% if profile.resume %}
+                    <p class="text-muted small mb-4">Resume Uploaded</p>
+                    <a href="{{ profile.resume.url }}" target="_blank" class="btn w-100" style="color: var(--han-purple); border: 2px solid var(--han-purple); font-weight: 600; border-radius: 10px; padding: 10px;"><i class="fas fa-eye me-2"></i> View Document</a>
+                {% else %}
+                    <p class="text-muted small mb-4 fst-italic">No resume uploaded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

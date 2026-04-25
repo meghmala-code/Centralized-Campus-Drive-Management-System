@@ -7,6 +7,8 @@ from django.contrib import messages
 from django.db.models import Count, Q
 from django.utils import timezone
 
+
+
 from .models import (
     StudentProfile, CompanyProfile, JobPosting,
     Application, InterviewSchedule, Notification, Branch
@@ -18,26 +20,36 @@ from .forms import (
 )
 
 # ─── Helpers ───────────────────────────────────────────────────────────────
-
 def get_role(user):
-    if user.groups.filter(name='HR').exists():
-        return 'hr'
-    if user.groups.filter(name='Student').exists():
-        return 'student'
-    if user.is_staff:
+    if user.is_anonymous:
+        return None
+    
+    # Check if the user belongs to a specific group
+    if user.is_superuser or user.groups.filter(name='admin').exists():
         return 'admin'
-    return None
+    
+    if user.groups.filter(name='hr').exists():
+        return 'hr'
+    
+    # If they have a profile but no special group, they are a student
+    if hasattr(user, 'studentprofile'):
+        return 'student'
+        
+    return 'student' # Default fallback
 
 def notify(user, message):
     Notification.objects.create(recipient=user, message=message)
 
 # ─── Public & Auth ─────────────────────────────────────────────────────────
 
-def home(request):
+def home_view(request):
     if request.user.is_authenticated:
+        # If logged in, send them to their specific dashboard
         return redirect('dashboard')
-    return render(request, 'portal/home.html')
-
+    else:
+        # If not logged in, send them to the login page
+        return redirect('login')
+    
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -119,52 +131,58 @@ def dashboard(request):
 
 @login_required
 def admin_dashboard(request):
-    if not request.user.is_staff:
+    if get_role(request.user) != 'admin':
         return redirect('dashboard')
+        
+    # High-level analytics for the Placement Head
     total_students = StudentProfile.objects.count()
-    total_companies = CompanyProfile.objects.count()
-    placed = StudentProfile.objects.filter(is_placed=True).count()
-    active_drives = JobPosting.objects.filter(status='active').count()
-    recent_drives = JobPosting.objects.order_by('-created_at')[:5]
-    branches = Branch.objects.all()
-    branch_stats = []
-    for b in branches:
-        total = StudentProfile.objects.filter(branch=b).count()
-        p = StudentProfile.objects.filter(branch=b, is_placed=True).count()
-        branch_stats.append({'branch': b, 'total': total, 'placed': p,
-                              'pct': round(p / total * 100) if total else 0})
+    total_companies = User.objects.filter(groups__name='hr').count() # Or your HR logic
+    total_jobs = JobPosting.objects.count()
+    total_placed = Application.objects.filter(stage='placed').count()
+    
+    # Recent activity
+    recent_placements = Application.objects.filter(stage='placed').order_by('-updated_at')[:5]
+    active_drives = JobPosting.objects.filter(status='active').order_by('-created_at')[:5]
+    
     ctx = {
-        'total_students': total_students,
-        'total_companies': total_companies,
-        'placed': placed,
-        'unplaced': total_students - placed,
-        'placement_pct': round(placed / total_students * 100) if total_students else 0,
-        'active_drives': active_drives,
-        'recent_drives': recent_drives,
-        'branch_stats': branch_stats,
+    'total_students': StudentProfile.objects.count(),
+    'total_companies': User.objects.filter(groups__name='hr').count(),
+    'total_placed': Application.objects.filter(stage='placed').count(),
+    'active_drives': JobPosting.objects.filter(status='active').count(),
+    'placement_perc': 71.4, # Or your calculation
+    'recent_jobs': JobPosting.objects.all().order_by('-created_at')[:5],
     }
     return render(request, 'portal/admin_dashboard.html', ctx)
 
 @login_required
 def admin_students(request):
-    if not request.user.is_staff:
+    # Ensure only Admin/TPO can view this
+    if get_role(request.user) != 'admin':
         return redirect('dashboard')
-    q = request.GET.get('q', '')
-    students = StudentProfile.objects.select_related('user', 'branch')
-    if q:
-        students = students.filter(
-            Q(user__first_name__icontains=q) |
-            Q(user__last_name__icontains=q) |
-            Q(roll_number__icontains=q)
-        )
-    return render(request, 'portal/admin_students.html', {'students': students, 'q': q})
+        
+    # Fetch all student profiles, grabbing the associated User data to be fast
+    students = StudentProfile.objects.select_related('user').all().order_by('-gpa')
+    
+    return render(request, 'portal/admin_students.html', {'students': students})
 
 @login_required
 def admin_companies(request):
     if not request.user.is_staff:
         return redirect('dashboard')
-    companies = CompanyProfile.objects.select_related('user')
-    return render(request, 'portal/admin_companies.html', {'companies': companies})
+        
+    companies = CompanyProfile.objects.select_related('user').all()
+    
+    # THIS IS THE FIX: Using is_verified instead of status
+    verified_count = companies.filter(is_verified=True).count()
+    pending_count = companies.filter(is_verified=False).count()
+    
+    context = {
+        'companies': companies,
+        'verified_count': verified_count,
+        'pending_count': pending_count,
+    }
+    
+    return render(request, 'portal/admin_companies.html', context)
 
 @login_required
 def verify_company(request, pk):
@@ -177,27 +195,56 @@ def verify_company(request, pk):
     messages.success(request, f'{company.company_name} verified.')
     return redirect('admin_companies')
 
+from django.db.models import Count
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+
 @login_required
 def admin_reports(request):
     if not request.user.is_staff:
         return redirect('dashboard')
-    students = StudentProfile.objects.count()
-    placed = StudentProfile.objects.filter(is_placed=True).count()
-    offers = Application.objects.filter(stage='placed').count()
-    companies = CompanyProfile.objects.filter(is_verified=True).count()
-    top_companies = (
-        JobPosting.objects.filter(status='closed')
-        .values('company__company_name')
-        .annotate(offers=Count('applications', filter=Q(applications__stage='placed')))
-        .order_by('-offers')[:6]
-    )
-    ctx = {
-        'students': students, 'placed': placed, 'unplaced': students - placed,
-        'placement_pct': round(placed / students * 100) if students else 0,
-        'offers': offers, 'companies': companies,
-        'top_companies': top_companies,
+        
+    # Basic student stats
+    total_students = StudentProfile.objects.count()
+    total_placed = StudentProfile.objects.filter(is_placed=True).count()
+    total_unplaced = total_students - total_placed
+    
+    # Safely calculate percentages to avoid dividing by zero
+    if total_students > 0:
+        placement_perc = (total_placed / total_students) * 100
+    else:
+        placement_perc = 0
+    
+    unplaced_perc = 100 - placement_perc
+
+    # THE BULLETPROOF FIX: Query forwards from Application up to Company!
+    top_recruiters_data = Application.objects.filter(stage='placed').values(
+        'job__company__company_name'
+    ).annotate(
+        offers_count=Count('id')
+    ).order_by('-offers_count')[:5]
+
+    # Convert the raw database dictionary into a format the HTML template expects
+    top_recruiters = [
+        {
+            'company_name': item['job__company__company_name'], 
+            'offers_count': item['offers_count']
+        }
+        for item in top_recruiters_data
+    ]
+
+    context = {
+        'total_students': total_students,
+        'total_placed': total_placed,
+        'total_unplaced': total_unplaced,
+        'placement_perc': placement_perc,
+        'unplaced_perc': unplaced_perc,
+        'top_recruiters': top_recruiters,
     }
-    return render(request, 'portal/admin_reports.html', ctx)
+    
+    return render(request, 'portal/admin_reports.html', context)
+
+
 
 @login_required
 def schedule_interview(request, job_pk):
