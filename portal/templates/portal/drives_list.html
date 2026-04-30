@@ -38,7 +38,7 @@
             </div>
             <div class="d-flex align-items-center gap-4">
                 <div class="text-end d-none d-sm-block">
-                    <div class="lpa-text">{{ job.package|default:"-" }} LPA</div>
+                    <div class="lpa-text">{{ job.package_lpa|default:"-" }} LPA</div>
                 </div>
                 <a href="{% url 'apply_drive' pk=job.id %}" class="btn-apply text-center">Apply Now</a>
             </div>

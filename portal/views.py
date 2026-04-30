@@ -36,7 +36,7 @@ def get_role(user):
         return 'hr'
     
     # If they have a profile but no special group, they are a student
-    if hasattr(user, 'studentprofile'):
+    if user.groups.filter(name__iexact='student').exists() or hasattr(user, 'studentprofile'):
         return 'student'
         
     return None # Default fallback
@@ -396,12 +396,22 @@ def apply_drive(request, pk):
 def my_status(request):
     if get_role(request.user) != 'student':
         return redirect('dashboard')
+        
     profile = get_object_or_404(StudentProfile, user=request.user)
     applications = profile.applications.select_related('job', 'job__company').order_by('-updated_at')
-    stages = ['applied', 'written_test', 'technical', 'hr', 'placed']
+    
+    # I went ahead and added 'gd' to this list to match your updated model!
+    stages = ['applied','shortlisted', 'written_test', 'gd', 'technical', 'hr', 'placed'] 
+    
+    # ---> FETCH THE NOTIFICATIONS <---
+    # Grabs the 5 most recent notifications for this specific student
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-id')[:5]
+    # ---------------------------------
+
     return render(request, 'portal/my_status.html', {
         'applications': applications,
         'stages': stages,
+        'notifications': notifications, # Pass the variable to the HTML template
     })
 
 # ─── HR Views ──────────────────────────────────────────────────────────────
@@ -455,17 +465,27 @@ def hr_candidates(request, job_pk):
     return render(request, 'portal/candidates.html', {'job': job, 'applications': applications})
 
 @login_required
-def update_application_status(request, pk):
+def update_application_status(request, app_pk):
     # Security: Ensure only HR can access this
     if get_role(request.user) != 'hr':
         return redirect('dashboard')
         
-    application = get_object_or_404(Application, pk=pk)
+    application = get_object_or_404(Application, pk=app_pk)
     
     if request.method == 'POST':
         form = ApplicationStatusForm(request.POST, instance=application)
         if form.is_valid():
-            form.save()
+            updated_app = form.save()
+            
+            # 2. ---> TRIGGER THE NOTIFICATION <---
+            student_user = updated_app.student.user
+            company_name = updated_app.job.company.company_name
+            new_stage = updated_app.get_stage_display() # Gets the readable text (e.g., "Shortlisted")
+            
+            alert_msg = f"Status Update: Your application for {company_name} has been moved to '{new_stage}'."
+            notify(student_user, alert_msg)
+
+
             messages.success(request, f"Updated {application.student.user.get_full_name()}'s status.")
             return redirect('hr_candidates', job_pk=application.job.id)
     else:

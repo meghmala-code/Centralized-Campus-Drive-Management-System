@@ -85,7 +85,7 @@
                     {% for job in jobs %}
                     <tr>
                         <td class="ps-4"><div class="fw-bold" style="color: var(--han-purple);">{{ job.title }}</div></td>
-                        <td><div class="fw-bold" style="color: var(--ruby);">{{ job.package|default:"-" }} LPA</div></td>
+                        <td><div class="fw-bold" style="color: var(--ruby);">{{ job.package_lpa|default:"-" }} LPA</div></td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-users me-2 text-muted"></i> {{ job.applicant_count|default:"0" }}

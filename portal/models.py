@@ -69,18 +69,25 @@ class JobPosting(models.Model):
 
     # Inside class JobPosting(models.Model):
     def is_student_eligible(self, student_profile):
-    # Check CGPA
+    # 1. Check CGPA requirement
         if student_profile.gpa < self.min_gpa:
             return False
-    # Check Branch
-        if self.eligible_branches.all() and student_profile.branch not in [b.name for b in self.eligible_branches.all()]:
-            return False
+
+    # 2. Check Branch requirement
+    # If no branches are specified, assume all are eligible
+        if self.eligible_branches.exists():
+        # Check if the student's branch ID is in the allowed branches
+            if not self.eligible_branches.filter(id=student_profile.branch.id).exists():
+                return False
+
         return True
 
 class Application(models.Model):
     STAGE_CHOICES = [
         ('applied', 'Applied'),
+        ('shortlisted', 'Shortlisted'),
         ('written_test', 'Written Test'),
+        ('gd', 'Group Discussion'),
         ('technical', 'Technical Interview'),
         ('hr', 'HR Round'),
         ('placed', 'Placed'),
@@ -101,7 +108,7 @@ class Application(models.Model):
         return f"{self.student} → {self.job} [{self.stage}]"
 
     def stage_index(self):
-        stages = ['applied', 'written_test', 'technical', 'hr', 'placed']
+        stages = ['applied', 'shortlisted','written_test','gd', 'technical', 'hr', 'placed']
         return stages.index(self.stage) if self.stage in stages else -1
 
 
