@@ -19,6 +19,10 @@ from .forms import (
     ApplicationStatusForm, InterviewScheduleForm
 )
 
+
+
+
+
 # ─── Helpers ───────────────────────────────────────────────────────────────
 def get_role(user):
     if user.is_anonymous:
@@ -35,7 +39,7 @@ def get_role(user):
     if hasattr(user, 'studentprofile'):
         return 'student'
         
-    return 'student' # Default fallback
+    return None # Default fallback
 
 def notify(user, message):
     Notification.objects.create(recipient=user, message=message)
@@ -48,7 +52,7 @@ def home_view(request):
         return redirect('dashboard')
     else:
         # If not logged in, send them to the login page
-        return redirect('login')
+        return render(request, 'portal/home.html')
     
 def login_view(request):
     if request.user.is_authenticated:
@@ -66,7 +70,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
 def register_student(request):
     if request.method == 'POST':
@@ -100,7 +104,7 @@ def register_hr(request):
             user.last_name = form.cleaned_data['last_name']
             user.email = form.cleaned_data['email']
             user.save()
-            group, _ = Group.objects.get_or_create(name='HR')
+            group, _ = Group.objects.get_or_create(name='hr')
             user.groups.add(group)
             CompanyProfile.objects.create(
                 user=user,
@@ -118,6 +122,8 @@ def register_hr(request):
 
 @login_required
 def dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('home')
     role = get_role(request.user)
     if role == 'admin':
         return redirect('admin_dashboard')
@@ -125,7 +131,28 @@ def dashboard(request):
         return redirect('student_dashboard')
     if role == 'hr':
         return redirect('hr_dashboard')
-    return redirect('login')
+    else:
+        # 1. Check if they have the HR group, but their CompanyProfile is missing
+        if request.user.groups.filter(name__iexact='hr').exists():
+            dynamic_error = "Your HR account is registered, but your Company Profile data is missing or corrupted."
+            
+        # 2. Check if they have absolutely no groups and no profiles at all
+        elif not request.user.groups.exists() and not hasattr(request.user, 'studentprofile'):
+            dynamic_error = "Your account has no assigned role. It looks like your registration was interrupted."
+            
+        # 3. Catch-all for weird database ghosts (like our uppercase 'HR' bug)
+        else:
+            # This grabs whatever weird group they belong to and shows it to them
+            group_names = ", ".join([g.name for g in request.user.groups.all()])
+            if group_names:
+                dynamic_error = f"Unrecognized permission group detected: '{group_names}'. Please contact an administrator."
+            else:
+                dynamic_error = "Critical account configuration error. Please contact support."
+
+        # Log them out and show the specific dynamic error
+        logout(request)
+        messages.error(request, dynamic_error)
+        return redirect('login')
 
 # ─── Admin Views ───────────────────────────────────────────────────────────
 

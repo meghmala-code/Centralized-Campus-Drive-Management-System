@@ -70,7 +70,7 @@ class JobPostingForm(BootstrapFormMixin, forms.ModelForm):
         widgets = {
             'interview_date': forms.DateInput(attrs={'type': 'date'}),
             'application_deadline': forms.DateInput(attrs={'type': 'date'}),
-            'eligible_branches': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+            'eligible_branches': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input custom-checkbox-list'}),
             'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe the role and responsibilities...'}),
             'required_skills': forms.TextInput(attrs={'placeholder': 'e.g. Python, DSA, System Design'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
