@@ -32,5 +32,11 @@ urlpatterns = [
     path('admin-panel/companies/', views.admin_companies, name='admin_companies'),
     path('admin-panel/companies/<int:pk>/verify/', views.verify_company, name='verify_company'), # Dynamic ID
     path('admin-panel/reports/', views.admin_reports, name='admin_reports'),
-    path('admin-panel/job/<int:job_pk>/schedule/', views.schedule_interview, name='schedule_interview'), # Dynamic ID
+    #path('admin-panel/job/<int:job_pk>/schedule/', views.schedule_interview, name='schedule_interview'), # Dynamic ID
+    path('hr/application/<int:app_pk>/quick/<str:action>/', views.quick_update_status, name='quick_update_status'),
+
+    path('admin-panel/drive/<int:job_id>/schedule/', views.schedule_interview, name='schedule_interview'),
+
+    path('admin-panel/company/<int:company_id>/', views.admin_company_detail, name='admin_company_detail'),
+    path('admin-panel/drive/<int:job_id>/candidates/', views.admin_drive_candidates, name='admin_drive_candidates'),
 ]

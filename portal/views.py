@@ -271,30 +271,90 @@ def admin_reports(request):
     
     return render(request, 'portal/admin_reports.html', context)
 
-
-
 @login_required
-def schedule_interview(request, job_pk):
-    # Restricted strictly to admin as per our workflow design
-    if not request.user.is_staff:
-        return redirect('dashboard')
-    job = get_object_or_404(JobPosting, pk=job_pk)
+def schedule_interview(request, job_id):
+    job = get_object_or_404(JobPosting, pk=job_id)
+    active_apps = Application.objects.filter(job=job).exclude(stage__in=['applied', 'rejected', 'placed'])
+
     if request.method == 'POST':
         form = InterviewScheduleForm(request.POST)
         if form.is_valid():
-            schedule = form.save(commit=False)
-            schedule.job = job
-            schedule.save()
-            form.save_m2m()
-            for student in schedule.candidates.all():
-                notify(student.user,
-                       f'Interview scheduled for {job.title}: {schedule.get_round_type_display()} on '
-                       f'{schedule.date_time.strftime("%d %b %Y %I:%M %p")} — {schedule.venue_or_link}')
-            messages.success(request, 'Interview scheduled and students notified.')
-            return redirect('admin_dashboard') # Returns admin to their dashboard
+            round_type = form.cleaned_data['round_type']
+            scheduled_at = form.cleaned_data['scheduled_at']
+            meeting_link = form.cleaned_data['meeting_link']
+            room_location = form.cleaned_data['room_location']
+            notes = form.cleaned_data['notes']
+
+            schedules_to_create = []
+            
+            for app in active_apps:
+                # 1. Prepare the schedule object
+                schedule = InterviewSchedule(
+                    job=job,
+                    application=app,
+                    round_type=round_type,
+                    scheduled_at=scheduled_at,
+                    date_time=scheduled_at,      # <--- THE MAGIC FIX: Satisfies the old database column!
+                    meeting_link=meeting_link,
+                    room_location=room_location,
+                    notes=notes
+                )
+                schedules_to_create.append(schedule)
+                
+                # 2. Update their application stage
+                app.stage = round_type
+                
+                # 3. NOTIFY THE STUDENT
+                alert_msg = f"Your {schedule.get_round_type_display()} has been scheduled for {scheduled_at.strftime('%d %b %Y %I:%M %p')}."
+                notify(app.student.user, alert_msg)
+
+            # Bulk save to the database for performance
+            if schedules_to_create:
+                InterviewSchedule.objects.bulk_create(schedules_to_create)
+                Application.objects.bulk_update(active_apps, ['stage'])
+
+            messages.success(request, f"✅ Successfully scheduled {round_type} and notified {active_apps.count()} candidates!")
+            return redirect('admin_drive_candidates', job_id=job.id)
     else:
         form = InterviewScheduleForm()
-    return render(request, 'portal/schedule_interview.html', {'form': form, 'job': job})
+
+    context = {
+        'form': form,
+        'job': job,
+        'candidate_count': active_apps.count()
+    }
+    return render(request, 'portal/schedule_interview.html', context)
+
+@login_required
+def admin_company_detail(request, company_id):
+    """Shows the company details and all the job drives they are hosting."""
+    company = get_object_or_404(CompanyProfile, pk=company_id)
+    
+    # Changed Job to JobPosting
+    jobs = JobPosting.objects.filter(company=company).order_by('-created_at')
+
+    context = {
+        'company': company,
+        'jobs': jobs
+    }
+    return render(request, 'portal/admin_company_detail.html', context)
+
+
+@login_required
+def admin_drive_candidates(request, job_id):
+    """Shows all students who applied for a specific job drive."""
+    # Changed Job to JobPosting
+    job = get_object_or_404(JobPosting, pk=job_id)
+    
+    # Assuming your Application model links to JobPosting via a field named 'job'
+    applications = Application.objects.filter(job=job).select_related('student__user')
+
+    context = {
+        'job': job,
+        'applications': applications
+    }
+    return render(request, 'portal/admin_drive_candidates.html', context)
+
 
 # ─── Student Views ─────────────────────────────────────────────────────────
 
@@ -500,3 +560,32 @@ def update_application_status(request, app_pk):
 def mark_notifications_read(request):
     request.user.notifications.filter(is_read=False).update(is_read=True)
     return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
+
+# Make sure you have imported your notify function at the top!
+
+@login_required
+def quick_update_status(request, app_pk, action):
+    # Security check
+    if get_role(request.user) != 'hr':
+        return redirect('dashboard')
+        
+    application = get_object_or_404(Application, pk=app_pk)
+    student_name = application.student.user.get_full_name()
+    company_name = application.job.company.company_name
+    
+    # Process the quick action
+    if action == 'shortlist':
+        application.stage = 'shortlisted'
+        messages.success(request, f"✅ {student_name} has been shortlisted!")
+        notify(application.student.user, f"Great news! Your profile has been shortlisted for {company_name}. Next step: Written Test.")
+        
+    elif action == 'reject':
+        application.stage = 'rejected'
+        messages.warning(request, f"❌ {student_name} was rejected.")
+        # Optional: You can choose not to notify students of rejections right away to soften the blow
+        # notify(application.student.user, f"Update: Your application for {company_name} was not selected to move forward.")
+        
+    application.save()
+    
+    # Instantly redirect back to the candidate list
+    return redirect('hr_candidates', job_pk=application.job.id)

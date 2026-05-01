@@ -112,22 +112,35 @@ class Application(models.Model):
         return stages.index(self.stage) if self.stage in stages else -1
 
 
+# ─────────────────────────────────────────────
+# FEATURE 1: INTERVIEW SCHEDULE
+# ─────────────────────────────────────────────
 class InterviewSchedule(models.Model):
-    MODE_CHOICES = [
-        ('online', 'Online'),
-        ('offline', 'In-Person'),
-    ]
     ROUND_CHOICES = [
-        ('written', 'Written Test'),
+        ('written_test', 'Written Test'),
+        ('gd', 'Group Discussion'),
         ('technical', 'Technical Interview'),
         ('hr', 'HR Round'),
-        ('gd', 'Group Discussion'),
     ]
+
+    # Links this schedule directly to a specific student's application
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='interviews')
+    round_type = models.CharField(max_length=20, choices=ROUND_CHOICES)
+    scheduled_at = models.DateTimeField()
+    meeting_link = models.URLField(blank=True, null=True, help_text="Optional: For virtual interviews")
+    room_location = models.CharField(max_length=200, blank=True, null=True, help_text="Optional: For offline interviews")
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-scheduled_at']
+
+    def __str__(self):
+        return f"{self.application.student.user.get_full_name()} - {self.get_round_type_display()}"
 
     job = models.ForeignKey(JobPosting, on_delete=models.CASCADE, related_name='schedules')
     round_type = models.CharField(max_length=20, choices=ROUND_CHOICES)
     date_time = models.DateTimeField()
-    mode = models.CharField(max_length=10, choices=MODE_CHOICES)
+    mode = models.CharField(max_length=25, choices=ROUND_CHOICES)
     venue_or_link = models.CharField(max_length=300)
     candidates = models.ManyToManyField(StudentProfile, blank=True, related_name='scheduled_interviews')
 

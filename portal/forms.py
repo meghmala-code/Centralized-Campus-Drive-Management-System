@@ -87,14 +87,18 @@ class ApplicationStatusForm(BootstrapFormMixin, forms.ModelForm):
         }
 
 
-class InterviewScheduleForm(BootstrapFormMixin, forms.ModelForm):
+class InterviewScheduleForm(forms.ModelForm):
+    # This widget creates a native browser calendar/clock picker
+    scheduled_at = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'})
+    )
+
     class Meta:
         model = InterviewSchedule
-        fields = ['round_type', 'date_time', 'mode', 'venue_or_link', 'candidates']
+        fields = ['round_type', 'scheduled_at', 'meeting_link', 'room_location', 'notes']
         widgets = {
-            'date_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'round_type': forms.Select(attrs={'class': 'form-select'}),
-            'mode': forms.Select(attrs={'class': 'form-select'}),
-            'venue_or_link': forms.TextInput(attrs={'placeholder': 'e.g. Room 304 or Zoom Link'}),
-            'candidates': forms.CheckboxSelectMultiple(),
+            'meeting_link': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://meet.google.com/...'}),
+            'room_location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Block B, Room 302'}),
+            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'e.g., Bring your physical resume.'}),
         }

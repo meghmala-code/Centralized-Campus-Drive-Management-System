@@ -3,7 +3,10 @@
 
 {% block content %}
 <div class="mb-4">
-    <a href="{% url 'admin_dashboard' %}" class="text-muted text-decoration-none small fw-semibold mb-2 d-inline-block"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
+    <!-- Fixed Back Link -->
+    <a href="{% url 'admin_drive_candidates' job_id=job.id %}" class="text-muted text-decoration-none small fw-semibold mb-2 d-inline-block">
+        <i class="fas fa-arrow-left me-1"></i> Back to Candidates
+    </a>
     <h3 class="fw-bold mb-0 text-dark">Schedule Interview Round</h3>
 </div>
 
@@ -12,12 +15,11 @@
         <div class="card border-top border-5" style="border-top-color: var(--kobi) !important;">
             <div class="card-body p-4 p-lg-5">
                 
-                <div class="job-context-box">
+                <div class="job-context-box mb-4">
                     <h5 class="fw-bold mb-2 text-dark">{{ job.company.company_name }} <span class="fw-normal" style="color: var(--han-purple);">— {{ job.title }}</span></h5>
-                    <div class="text-muted small fw-medium">
-                        <i class="fas fa-rupee-sign me-1" style="color: var(--kobi)"></i> {{ job.package|default:"N/A" }} LPA 
-                        <span class="mx-2">•</span> 
-                        <i class="far fa-calendar-alt me-1" style="color: var(--middle-blue)"></i> Posted: {{ job.created_at|date:"d M Y" }}
+                    
+                    <div class="alert alert-info py-2 mt-3 mb-0" style="background-color: rgba(126, 212, 230, 0.1); border-color: var(--middle-blue); color: #0d5c6b;">
+                        <i class="fas fa-info-circle me-2"></i> This will schedule the round for <strong>{{ candidate_count }} active candidates</strong>.
                     </div>
                 </div>
 
@@ -27,8 +29,11 @@
                     {{ form.as_p }}
 
                     <div class="d-flex gap-3 pt-4">
-                        <button type="submit" class="btn btn-primary-custom flex-fill"><i class="fas fa-paper-plane me-2"></i> Schedule & Notify</button>
-                        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-custom text-center" style="min-width: 120px;">Cancel</a>
+                        <button type="submit" class="btn flex-fill" style="background-color: var(--han-purple); color: white;">
+                            <i class="fas fa-paper-plane me-2"></i> Schedule & Notify All
+                        </button>
+                        <!-- Fixed Cancel Link -->
+                        <a href="{% url 'admin_drive_candidates' job_id=job.id %}" class="btn btn-outline-secondary">Cancel</a>
                     </div>
                 </form>
 
