@@ -92,6 +92,7 @@ class Application(models.Model):
         ('hr', 'HR Round'),
         ('placed', 'Placed'),
         ('rejected', 'Rejected'),
+        ('withdrawn', 'Auto-Withdrawn (Placed Elsewhere)'),
     ]
 
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='applications')

@@ -40,7 +40,15 @@
                 <div class="text-end d-none d-sm-block">
                     <div class="lpa-text">{{ job.package_lpa|default:"-" }} LPA</div>
                 </div>
-                <a href="{% url 'apply_drive' pk=job.id %}" class="btn-apply text-center">Apply Now</a>
+                {% if is_already_placed %}
+                <button class="btn btn-secondary w-100 disabled" style="cursor: not-allowed;" title="You are already placed in another company.">
+                 <i class="fas fa-lock me-2"></i> Placed
+                </button>
+                {% else %}
+                <a href="{% url 'apply_drive' pk=job.id %}" class="btn btn-primary w-100">
+                         Apply Now
+                </a>
+                {% endif %}
             </div>
         </div>
         {% empty %}

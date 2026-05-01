@@ -340,18 +340,86 @@ def admin_company_detail(request, company_id):
     return render(request, 'portal/admin_company_detail.html', context)
 
 
+
 @login_required
 def admin_drive_candidates(request, job_id):
-    """Shows all students who applied for a specific job drive."""
-    # Changed Job to JobPosting
     job = get_object_or_404(JobPosting, pk=job_id)
     
-    # Assuming your Application model links to JobPosting via a field named 'job'
+    # --- 1. HANDLE BULK ACTIONS (POST) ---
+    if request.method == 'POST':
+        action = request.POST.get('bulk_action')
+        selected_ids = request.POST.getlist('selected_candidates')
+        
+        if action and selected_ids:
+            apps_to_update = Application.objects.filter(id__in=selected_ids, job=job)
+            
+            if action == 'reject':
+                apps_to_update.update(stage='rejected')
+                messages.error(request, f"Bulk Action: {apps_to_update.count()} candidates rejected.")
+            elif action == 'placed':
+                apps_to_update.update(stage='placed')
+                # Note: This is where you'd trigger the Conflict Management to withdraw them from other drives!
+                # 2. CONFLICT MANAGEMENT: Get the IDs of the students who just got placed
+                student_ids_placed = apps_to_update.values_list('student_id', flat=True)
+                # 3. Find all their OTHER active applications and auto-withdraw them
+                other_active_apps = Application.objects.filter(
+                    student_id__in=student_ids_placed
+                ).exclude(
+                    job=job  # Don't touch the job they just got
+                ).exclude(
+                    stage__in=['rejected', 'placed', 'withdrawn'] # Don't touch already finished pipelines
+                )
+                
+                # Count how many collateral applications we are closing
+                collateral_count = other_active_apps.count()
+                
+                # Execute the withdrawal
+                other_active_apps.update(stage='withdrawn')
+
+                messages.success(request, f"🌟 {apps_to_update.count()} candidates placed! {collateral_count} competing applications were auto-withdrawn.")
+                
+            
+            elif action == 'reset':
+                apps_to_update.update(stage='applied')
+                messages.info(request, f"Bulk Action: {apps_to_update.count()} candidates reset to Applied stage.")
+            else:
+                # This automatically handles shortlisted, written, gd, technical, hr, and placed!
+                apps_to_update.update(stage=action)
+                messages.success(request, f"Bulk Action: {apps_to_update.count()} candidates moved to {action.upper()} stage!")
+            
+            return redirect('admin_drive_candidates', job_id=job.id)
+
+    # --- 2. HANDLE FILTERING (GET) ---
     applications = Application.objects.filter(job=job).select_related('student__user')
+
+    search_query = request.GET.get('search', '')
+    filter_branch = request.GET.get('branch', '')
+    filter_stage = request.GET.get('stage', '')
+    filter_min_gpa = request.GET.get('min_gpa', '')
+
+    if search_query:
+        applications = applications.filter(
+            Q(student__user__first_name__icontains=search_query) | 
+            Q(student__user__last_name__icontains=search_query)
+        )
+    if filter_branch:
+        applications = applications.filter(Q(student__branch__name__icontains=filter_branch) | 
+            Q(student__branch__code__icontains=filter_branch))
+    if filter_stage:
+        applications = applications.filter(stage=filter_stage)
+    if filter_min_gpa:
+        try:
+            applications = applications.filter(student__gpa__gte=float(filter_min_gpa))
+        except ValueError:
+            pass
 
     context = {
         'job': job,
-        'applications': applications
+        'applications': applications,
+        'current_search': search_query,
+        'current_branch': filter_branch,
+        'current_stage': filter_stage,
+        'current_gpa': filter_min_gpa,
     }
     return render(request, 'portal/admin_drive_candidates.html', context)
 
@@ -426,30 +494,48 @@ def drives_list(request):
     # We will call this 'jobs' to keep it simple
     jobs = JobPosting.objects.filter(status='active').select_related('company')
     
+    # --- 2. THE PROACTIVE GATEKEEPER (UI FLAG) ---
+    is_already_placed = Application.objects.filter(student=profile, stage='placed').exists()
+    
     # DEBUG: This will print in your terminal so we can see if Django thinks you have a resume
     print(f"DEBUG: Student {request.user.username} has resume: {bool(profile.resume)}")
+    print(f"DEBUG: Student is already placed: {is_already_placed}")
     
     return render(request, 'portal/drives_list.html', {
         'jobs': jobs, 
-        'profile': profile  # This is the key that unlocks the buttons!
+        'profile': profile,
+        'is_already_placed': is_already_placed  # <-- This unlocks the UI lock
     })
 
 @login_required
 def apply_drive(request, pk):
     if get_role(request.user) != 'student':
         return redirect('dashboard')
+        
     profile = get_object_or_404(StudentProfile, user=request.user)
+    
+    # --- 1. THE PROACTIVE GATEKEEPER (BACKEND LOCK) ---
+    is_already_placed = Application.objects.filter(student=profile, stage='placed').exists()
+    
+    if is_already_placed:
+        messages.error(request, "Conflict Management: You are already placed and cannot apply for new drives.")
+        return redirect('drives_list')
+        
     job = get_object_or_404(JobPosting, pk=pk, status='active')
+    
     if not job.is_student_eligible(profile):
         messages.error(request, 'You are not eligible for this drive.')
         return redirect('drives_list')
+        
     app, created = Application.objects.get_or_create(student=profile, job=job)
+    
     if created:
         notify(request.user, f'You have successfully applied for {job.title} at {job.company.company_name}.')
         notify(job.company.user, f'{profile.user.get_full_name()} applied for {job.title}.')
         messages.success(request, f'Applied to {job.title} successfully!')
     else:
         messages.info(request, 'You have already applied for this drive.')
+        
     return redirect('drives_list')
 
 @login_required

@@ -1,4 +1,4 @@
-{% extends 'portal/base_admin.html' %}
+{% extends 'portal/base_admin.html' %} <!-- Ensure your base tag is here -->
 
 {% block content %}
 <!-- BACK BUTTON -->
@@ -9,69 +9,161 @@
 </div>
 
 <!-- HEADER & BULK SCHEDULE BUTTON -->
-<!-- The d-flex and justify-content-between perfectly push the button to the right -->
 <div class="d-flex justify-content-between align-items-end mb-4">
     <div>
         <h3 class="fw-bold mb-1 text-dark">{{ job.title }} Candidates</h3>
-        <p class="text-muted small mb-0">{{ job.company.company_name }} | {{ applications.count }} Total Applicants</p>
+        <p class="text-muted small mb-0">{{ job.company.company_name }} | {{ applications.count }} Filtered Applicants</p>
     </div>
     <div>
-        <!-- THE NEW BULK SCHEDULE BUTTON -->
         <a href="{% url 'schedule_interview' job_id=job.id %}" class="btn shadow-sm" style="background-color: var(--han-purple); color: white; border-radius: 8px; font-weight: 600;">
             <i class="fas fa-calendar-plus me-2"></i> Schedule Next Round
         </a>
     </div>
 </div>
 
-<!-- CANDIDATES TABLE -->
-<div class="card border-top border-5 shadow-sm" style="border-top-color: var(--kobi) !important;">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-4 py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Candidate Name</th>
-                        <th class="py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Branch / GPA</th>
-                        <th class="py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Current Stage</th>
-                        <th class="text-end pe-4 py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Action Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for app in applications %}
-                    <tr>
-                        <td class="ps-4 py-3">
-                            <strong class="text-dark">{{ app.student.user.get_full_name }}</strong><br>
-                            <small class="text-muted">{{ app.student.roll_number }}</small>
-                        </td>
-                        <td>
-                            <div class="text-dark">{{ app.student.branch }}</div>
-                            <div class="fw-bold" style="font-size: 12px; color: {% if app.student.gpa >= job.min_gpa %}var(--middle-blue){% else %}var(--ruby){% endif %};">
-                                GPA: {{ app.student.gpa }}
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge bg-light text-dark border border-secondary" style="font-size: 11px; padding: 6px 12px; border-radius: 8px; font-weight: 600; text-transform: uppercase;">
-                                {{ app.get_stage_display }}
-                            </span>
-                        </td>
-                        <td class="text-end pe-4">
-                            {% if app.stage != 'applied' and app.stage != 'rejected' and app.stage != 'placed' %}
-                                <small class="text-primary fw-bold"><i class="fas fa-check-circle me-1"></i> Ready for Next Round</small>
-                            {% elif app.stage == 'applied' %}
-                                <small class="text-muted fst-italic">Awaiting HR Screening</small>
-                            {% else %}
-                                <small class="text-muted fst-italic">Workflow Concluded</small>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center py-5 text-muted fst-italic">No candidates have applied for this drive yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<!-- ========================================== -->
+<!-- 1. ADVANCED FILTERING FORM (GET)           -->
+<!-- ========================================== -->
+<div class="card mb-4 border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-body p-3">
+        <form method="GET" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small text-muted fw-bold mb-1">Search Name</label>
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Student name..." value="{{ current_search }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted fw-bold mb-1">Branch</label>
+                <input type="text" name="branch" class="form-control form-control-sm" placeholder="e.g. CSE" value="{{ current_branch }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted fw-bold mb-1">Min GPA</label>
+                <input type="number" step="0.1" name="min_gpa" class="form-control form-control-sm" placeholder="7.5" value="{{ current_gpa }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted fw-bold mb-1">Pipeline Stage</label>
+                <select name="stage" class="form-select form-select-sm">
+                    <option value="">All Stages</option>
+                    <option value="applied" {% if current_stage == 'applied' %}selected{% endif %}>Applied</option>
+                    <option value="shortlisted" {% if current_stage == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+                    <option value="written" {% if current_stage == 'written' %}selected{% endif %}>Written Test</option>
+                    <option value="gd" {% if current_stage == 'gd' %}selected{% endif %}>Group Discussion</option>
+                    <option value="technical" {% if current_stage == 'technical' %}selected{% endif %}>Technical Round</option>
+                    <option value="hr" {% if current_stage == 'hr' %}selected{% endif %}>HR Round</option>
+                    <option value="placed" {% if current_stage == 'placed' %}selected{% endif %}>Placed</option>
+                    <option value="rejected" {% if current_stage == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-dark w-100"><i class="fas fa-filter"></i> Filter</button>
+                <a href="{% url 'admin_drive_candidates' job_id=job.id %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-undo"></i></a>
+            </div>
+        </form>
     </div>
 </div>
+
+<!-- ========================================== -->
+<!-- 2. BULK ACTION FORM & TABLE (POST)         -->
+<!-- ========================================== -->
+<form method="POST">
+    {% csrf_token %}
+    
+    <!-- Bulk Action Toolbar -->
+    <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-white shadow-sm rounded-3 border">
+        <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" id="selectAllCheckbox">
+            <label class="form-check-label fw-bold text-dark small" for="selectAllCheckbox">
+                Select All on Page
+            </label>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <span class="small text-muted fw-bold me-2">Bulk Action:</span>
+            <select name="bulk_action" class="form-select form-select-sm" style="width: 200px;" required>
+                <option value="" disabled selected>Choose action...</option>
+                <option value="shortlisted">📋 Mark as Shortlisted</option>
+                <option value="written">✍️ Move to Written Test</option>
+                <option value="gd">🗣️ Move to Group Discussion</option>
+                <option value="technical">💻 Move to Technical</option>
+                <option value="hr">🤝 Move to HR</option>
+                <option value="placed">🌟 Mark as Placed</option>
+                <option value="reject">❌ Mark as Rejected</option>
+                <option value="reset">🔄 Reset to Applied</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-primary fw-bold px-3">Execute</button>
+        </div>
+    </div>
+
+    <!-- CANDIDATES TABLE -->
+    <div class="card border-top border-5 shadow-sm" style="border-top-color: var(--kobi) !important;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <!-- NEW: Checkbox Column Header -->
+                            <th class="ps-4 py-3" style="width: 40px; background-color: var(--bg-light);"></th>
+                            <th class="py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Candidate Name</th>
+                            <th class="py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Branch / GPA</th>
+                            <th class="py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Current Stage</th>
+                            <th class="text-end pe-4 py-3" style="background-color: var(--bg-light); color: var(--han-purple); font-size: 12px; text-transform: uppercase;">Action Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <!-- NEW: Checkbox Column Data -->
+                            <td class="ps-4 py-3">
+                                <input class="form-check-input candidate-checkbox" type="checkbox" name="selected_candidates" value="{{ app.id }}">
+                            </td>
+                            <td>
+                                <strong class="text-dark">{{ app.student.user.get_full_name }}</strong><br>
+                                <small class="text-muted">{{ app.student.roll_number }}</small>
+                            </td>
+                            <td>
+                                <div class="text-dark">{{ app.student.branch }}</div>
+                                <div class="fw-bold" style="font-size: 12px; color: {% if app.student.gpa >= job.min_gpa %}var(--middle-blue){% else %}var(--ruby){% endif %};">
+                                    GPA: {{ app.student.gpa }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border border-secondary" style="font-size: 11px; padding: 6px 12px; border-radius: 8px; font-weight: 600; text-transform: uppercase;">
+                                    {{ app.get_stage_display }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <td class="text-end pe-4">
+                                {% if app.stage == 'placed' or app.stage == 'rejected' %}
+                                    <small class="text-muted fst-italic">Workflow Concluded</small>
+                                {% elif app.stage == 'applied' %}
+                                    <small class="text-muted fst-italic">Awaiting Shortlist</small>
+                                {% else %}
+                                    <small class="text-primary fw-bold"><i class="fas fa-check-circle me-1"></i> In Pipeline</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted fst-italic">No candidates match this criteria.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- JS for Select All Checkbox -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectAll = document.getElementById('selectAllCheckbox');
+        const checkboxes = document.querySelectorAll('.candidate-checkbox');
+
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+        });
+    });
+</script>
 {% endblock %}
