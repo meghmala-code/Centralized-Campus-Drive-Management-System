@@ -16,6 +16,7 @@
             --middle-blue: #7ED4E6;
             --ruby: #E0115F;
             --white: #FFFFFF;
+            
         }
 
         body {
@@ -39,10 +40,18 @@
 
         /* --- Hero Section --- */
         .hero {
-            padding: 100px 0;
-            background: radial-gradient(circle at top right, rgba(126, 212, 230, 0.1), transparent),
-                        radial-gradient(circle at bottom left, rgba(231, 159, 196, 0.1), transparent);
-        }
+    background-color: #fcfcfc;
+    
+    /* Creates massive, soft radial blobs of color */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(82, 24, 250, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(224, 17, 95, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(255, 204, 0, 0.15) 0px, transparent 50%);
+        
+    position: relative;
+    overflow: hidden;
+    min-height: 80vh;
+}
         .hero-title {
             font-size: 4rem;
             font-weight: 800;
@@ -127,6 +136,17 @@
             border-top: 10px solid var(--han-purple);
             padding: 50px 0;
         }
+        
+        /* Subtle floating animation for doodles and accents */
+        .float-anim {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Add slight delays so they don't all float up and down at the exact same time */
+        .delay-1 { animation-delay: 1s; }
+        .delay-2 { animation-delay: 2s; }
+
+        
     </style>
 </head>
 <body>
@@ -160,29 +180,42 @@
     </div>
 </nav>
 
-    <header class="hero position-relative">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="hero-title">Elevate Your <span class="text-purple">Career</span> <br>with <span class="text-ruby">Precision.</span></h1>
-                    <p class="lead my-4 text-secondary">A premium placement ecosystem connecting ambitious students with industry giants. Fast, transparent, and colorfully efficient.</p>
-                    <div class="d-flex gap-3">
-                        <a href="{% url 'register_student' %}" class="btn btn-main btn-lg px-5 rounded-pill">Get Started</a>
-                        <a href="{% url 'register_hr' %}" class="btn btn-yellow btn-lg px-5 rounded-pill fw-bold">Post a Job</a>
-                    </div>
-                </div>
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="position-relative p-5">
-                        <div class="p-5 border border-5 rounded-circle" style="border-color: var(--middle-blue) !important;">
-                            <img src="https://via.placeholder.com/400x400/FFFFFF/5218FA?text=Placement+Dashboard" class="img-fluid rounded-circle shadow">
-                        </div>
-                        <div class="position-absolute top-0 end-0 p-4 bg-kobi rounded-circle shadow-sm" style="width:100px; height:100px;"></div>
-                        <div class="position-absolute bottom-0 start-0 p-3 bg-maximum-yellow rounded-pill shadow-sm" style="width:150px; height:60px;"></div>
-                    </div>
+    <header class="hero position-relative overflow-hidden">
+    <div class="container">
+        <div class="row align-items-center" style="min-height: 80vh;">
+            
+            <div class="col-lg-6 position-relative z-index-2">
+                <h1 class="hero-title fw-bold display-4">Elevate Your <span style="color: var(--han-purple);">Career</span> <br>with <span style="color: var(--ruby);">Precision.</span></h1>
+                <p class="lead my-4 text-secondary">A premium placement ecosystem connecting ambitious students with industry giants. Fast, transparent, and colorfully efficient.</p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="{% url 'register_student' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" style="background-color: var(--han-purple); border: none;">Get Started</a>
+                    <a href="{% url 'register_hr' %}" class="btn btn-warning btn-lg px-5 rounded-pill fw-bold shadow-sm" style="background-color: var(--maximum-yellow); border: none;">Post a Job</a>
                 </div>
             </div>
+
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="position-relative p-5">
+                    {% load static %}
+                    <div class="position-absolute float-anim" style="top: 45%; left: 10px; z-index: 10;">
+                        <img src="{% static 'images/doodle-left.png' %}" alt="accent" style="width: 90px; transform: rotate(-15deg);">
+                    </div>
+
+                    <div class="p-3 shadow-lg bg-white position-relative" style="border: 50px solid var(--maximum-yellow); border-radius: 16px; z-index: 2;">
+                        <img src="{% static 'images/home.png' %}" alt="Placement Dashboard" class="img-fluid rounded" style="width: 100%; height: auto; max-height: 500px; object-fit: cover;">
+                    </div>
+
+                    <div class="position-absolute top-0 end-0 bg-kobi rounded-circle shadow float-anim delay-1 d-flex align-items-center justify-content-center" style="width:110px; height:110px; z-index: 5; background-color: var(--kobi); right: 20px !important;">
+                         <img src="{% static 'images/doodle-circle.png' %}" alt="accent" style="width: 80px;">
+                    </div>
+
+                    <div class="position-absolute bottom-0 start-0 bg-maximum-yellow rounded-pill shadow float-anim delay-2" style="width:150px; height:60px; z-index: 1; background-color: var(--maximum-yellow); margin-bottom: 20px; margin-left: 20px;"></div>
+                    
+                </div>
+            </div>
+            
         </div>
-    </header>
+    </div>
+</header>
 
     <section class="container py-5 my-5">
         <div class="text-center mb-5">

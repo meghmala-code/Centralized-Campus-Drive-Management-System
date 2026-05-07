@@ -490,13 +490,19 @@ def drives_list(request):
         return redirect('dashboard')
         
     profile = get_object_or_404(StudentProfile, user=request.user)
+
+    # This finds any active job where the deadline has passed, and instantly shuts it down.
+    JobPosting.objects.filter(status='active', application_deadline__lt=timezone.now()).update(status='closed')
     
     # We will call this 'jobs' to keep it simple
     jobs = JobPosting.objects.filter(status='active').select_related('company')
     
     # --- 2. THE PROACTIVE GATEKEEPER (UI FLAG) ---
     is_already_placed = Application.objects.filter(student=profile, stage='placed').exists()
-    
+    active_apps_count = Application.objects.filter(student=profile).exclude(stage__in=['rejected', 'withdrawn']).count()
+
+    has_reached_limit = active_apps_count >= 3
+
     # DEBUG: This will print in your terminal so we can see if Django thinks you have a resume
     print(f"DEBUG: Student {request.user.username} has resume: {bool(profile.resume)}")
     print(f"DEBUG: Student is already placed: {is_already_placed}")
@@ -504,7 +510,9 @@ def drives_list(request):
     return render(request, 'portal/drives_list.html', {
         'jobs': jobs, 
         'profile': profile,
-        'is_already_placed': is_already_placed  # <-- This unlocks the UI lock
+        'is_already_placed': is_already_placed,  # <-- This unlocks the UI lock
+        'has_reached_limit': has_reached_limit,
+        'active_apps_count': active_apps_count
     })
 
 @login_required
@@ -519,6 +527,14 @@ def apply_drive(request, pk):
     
     if is_already_placed:
         messages.error(request, "Conflict Management: You are already placed and cannot apply for new drives.")
+        return redirect('drives_list')
+    
+    # --- GATEKEEPER 2: The "3 Active Drives" Limit ---
+    # Count applications that are NOT in a finished state (rejected or withdrawn)
+    active_apps_count = Application.objects.filter(student=profile).exclude(stage__in=['rejected', 'withdrawn']).count()
+    
+    if active_apps_count >= 3:
+        messages.warning(request, "Application Limit Reached: You already have 3 active applications. You must wait for a result before applying to more.")
         return redirect('drives_list')
         
     job = get_object_or_404(JobPosting, pk=pk, status='active')
@@ -675,3 +691,47 @@ def quick_update_status(request, app_pk, action):
     
     # Instantly redirect back to the candidate list
     return redirect('hr_candidates', job_pk=application.job.id)
+
+@login_required
+def edit_job(request, pk):
+    if get_role(request.user) != 'hr':
+        return redirect('dashboard')
+        
+    company = get_object_or_404(CompanyProfile, user=request.user)
+    job = get_object_or_404(JobPosting, pk=pk, company=company)
+    
+    if request.method == 'POST':
+        form = JobPostingForm(request.POST, instance=job)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Job "{job.title}" updated successfully!')
+            return redirect('hr_dashboard')
+    else:
+        form = JobPostingForm(instance=job)
+        
+    return render(request, 'portal/edit_job.html', {'form': form, 'job': job})
+
+@login_required
+def delete_job(request, pk):
+    if get_role(request.user) != 'hr':
+        return redirect('dashboard')
+        
+    company = get_object_or_404(CompanyProfile, user=request.user)
+    job = get_object_or_404(JobPosting, pk=pk, company=company)
+    
+    if request.method == 'POST':
+        # --- THE TWO-STEP DELETION LOGIC ---
+        if job.status != 'closed':
+            # Step 1: Soft Delete (Close the drive)
+            job.status = 'closed'
+            job.save()
+            messages.warning(request, f'Drive "{job.title}" is now CLOSED. Clicking delete again will permanently erase it.')
+        else:
+            # Step 2: Hard Delete (Permanent Purge)
+            title = job.title
+            job.delete() # Destroys the job and cascades to delete all applications
+            messages.success(request, f'Drive "{title}" and all related data have been permanently deleted.')
+            
+        return redirect('hr_dashboard')
+        
+    return render(request, 'portal/confirm_delete_job.html', {'job': job})

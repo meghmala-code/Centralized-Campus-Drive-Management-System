@@ -1,0 +1,85 @@
+{% extends 'portal/base_hr.html' %}
+
+{% load static %}
+
+{% block content %}
+<style>
+    /* 1. THE BOX: Force it to be tall and spacious */
+    #id_eligible_branches {
+        min-height: 250px !important; /* FORCES the box to stay big */
+        max-height: 350px !important;
+        overflow-y: auto !important;
+        padding: 15px !important;
+        margin: 0 !important;
+        border: 2px solid #f0f0f0 !important;
+        border-radius: 10px !important;
+        background-color: #fafafa !important;
+        display: block !important; /* Stops Flexbox from collapsing it */
+        width: 100% !important;
+    }
+
+    /* 2. THE ROW: Ensure the checkbox and text align nicely */
+    #id_eligible_branches > div,
+    #id_eligible_branches > li {
+        display: flex !important;
+        align-items: center !important;
+        margin-bottom: 12px !important;
+        width: 100% !important;
+    }
+
+    /* 3. THE TEXT: Force it to stay horizontal, no matter what */
+    #id_eligible_branches label {
+        display: flex !important;
+        align-items: center !important;
+        white-space: nowrap !important; /* NO vertical stacking */
+        width: max-content !important;  /* Gives text all the room it needs */
+        margin: 0 !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        color: #2d3436 !important;
+        text-transform: none !important; /* Prevents giant uppercase labels */
+    }
+
+    /* 4. THE CHECKBOX: Lock its size so it doesn't vanish */
+    #id_eligible_branches input[type="checkbox"] {
+        flex-shrink: 0 !important; /* Stops the browser from crushing the box */
+        width: 18px !important;
+        height: 18px !important;
+        margin: 0 10px 0 0 !important; /* Exactly 10px gap between box and text */
+        cursor: pointer !important;
+    }
+    
+</style>
+
+
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4 gap-3">
+                <a href="{% url 'hr_dashboard' %}" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="fas fa-arrow-left"></i></a>
+                <div>
+                    <h3 class="fw-bold mb-0 text-dark">Edit Job Drive</h3>
+                    <p class="text-muted small mb-0">Updating details for: {{ job.title }}</p>
+                </div>
+            </div>
+
+            <div class="card border-top border-5 shadow-sm" style="border-top-color: var(--han-purple) !important; border-radius: 12px;">
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        
+                        <div class="d-flex justify-content-end gap-3 mt-5">
+                            <a href="{% url 'hr_dashboard' %}" class="btn btn-light fw-bold px-4">Cancel</a>
+                            <button type="submit" class="btn btn-primary fw-bold px-4" style="background-color: var(--han-purple); border: none;">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

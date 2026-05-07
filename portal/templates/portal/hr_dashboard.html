@@ -102,7 +102,20 @@
                         </td>
                         <td class="text-muted"><i class="far fa-calendar-alt me-1"></i> {{ job.created_at|date:"d M Y" }}</td>
                         <td class="text-end pe-4">
-                            <a href="{% url 'hr_candidates' job_pk=job.id %}" class="btn btn-sm btn-outline-custom me-1">Candidates</a>
+                            <div class="d-flex justify-content-end gap-2 align-items-center">
+                                <a href="{% url 'hr_candidates' job_pk=job.id %}" class="btn btn-sm btn-outline-custom">Candidates</a>
+                                
+                                <a href="{% url 'edit_job' pk=job.id %}" class="btn btn-sm btn-outline-primary" title="Edit Drive">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                
+                                <form action="{% url 'delete_job' pk=job.id %}" method="POST" class="m-0 p-0" onsubmit="return confirm('{% if job.status == 'closed' %}🚨 CRITICAL WARNING: This will PERMANENTLY erase the job and ALL student applications associated with it. This cannot be undone. Are you sure?{% else %}Are you sure you want to close this job drive? Students will no longer be able to apply.{% endif %}');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm {% if job.status == 'closed' %}btn-danger text-white{% else %}btn-outline-danger{% endif %}" title="{% if job.status == 'closed' %}Permanently Delete Drive{% else %}Close Drive{% endif %}">
+                                    <i class="fas {% if job.status == 'closed' %}fa-skull-crossbones{% else %}fa-trash-alt{% endif %}"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}

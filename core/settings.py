@@ -117,7 +117,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-import os # Make sure this is at the very top of your settings.py file if it isn't already!
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'portal/static'),
+]
+
+# Make sure this is at the very top of your settings.py file if it isn't already!
 
 # Media files (User uploaded content like Resumes and Profile Pictures)
 MEDIA_URL = '/media/'

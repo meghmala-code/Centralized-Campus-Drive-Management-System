@@ -104,6 +104,18 @@
         {% block extra_css %}{% endblock %}
     </style>
 </head>
+<script>
+    // Auto-dismiss floating alerts after 4 seconds
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(function() {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 4000); 
+    });
+</script>
 <body>
 
 <div class="container-fluid p-0">
@@ -112,17 +124,21 @@
             {% block sidebar %}{% endblock %}
         </div>
 
-        {% if messages %}
-    <div class="mb-4">
-        {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" style="border-radius: 12px;" role="alert">
-                <i class="fas fa-info-circle me-2"></i> {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+       {% if messages %}
+<div class="position-fixed top-0 end-0 p-4" style="z-index: 1055; margin-top: 60px; pointer-events: none;">
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-lg" style="border-radius: 8px; min-width: 320px; pointer-events: auto; border-left: 6px solid {% if message.tags == 'error' %}var(--ruby){% elif message.tags == 'success' %}var(--middle-blue){% else %}var(--han-purple){% endif %} !important;" role="alert">
+            
+            <div class="d-flex align-items-center">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} fs-5 me-3"></i>
+                <span class="fw-bold text-dark small">{{ message }}</span>
             </div>
-        {% endfor %}
-    </div>
+            
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size: 12px;"></button>
+        </div>
+    {% endfor %}
+</div>
 {% endif %}
-
         <div class="col-md-9 col-lg-10 p-4 p-md-5">
             {% block content %}{% endblock %}
         </div>

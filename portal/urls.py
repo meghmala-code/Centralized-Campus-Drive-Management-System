@@ -25,6 +25,9 @@ urlpatterns = [
     path('hr/post-job/', views.post_job, name='post_job'),
     path('hr/job/<int:job_pk>/candidates/', views.hr_candidates, name='hr_candidates'), # Dynamic ID
     path('hr/application/<int:app_pk>/update/', views.update_application_status, name='update_application_status'), # Dynamic ID
+    path('hr/job/<int:pk>/edit/', views.edit_job, name='edit_job'),
+    path('hr/job/<int:pk>/delete/', views.delete_job, name='delete_job'),
+    path('hr/application/<int:app_pk>/quick/<str:action>/', views.quick_update_status, name='quick_update_status'),
 
     # ─── Admin URLs ─────────────────────────────────────────────────
     path('admin-panel/dashboard/', views.admin_dashboard, name='admin_dashboard'),
@@ -33,7 +36,7 @@ urlpatterns = [
     path('admin-panel/companies/<int:pk>/verify/', views.verify_company, name='verify_company'), # Dynamic ID
     path('admin-panel/reports/', views.admin_reports, name='admin_reports'),
     #path('admin-panel/job/<int:job_pk>/schedule/', views.schedule_interview, name='schedule_interview'), # Dynamic ID
-    path('hr/application/<int:app_pk>/quick/<str:action>/', views.quick_update_status, name='quick_update_status'),
+    
 
     path('admin-panel/drive/<int:job_id>/schedule/', views.schedule_interview, name='schedule_interview'),
 

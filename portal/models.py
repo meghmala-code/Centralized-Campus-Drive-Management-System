@@ -56,7 +56,7 @@ class JobPosting(models.Model):
     min_gpa = models.FloatField(default=6.0, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)])
     eligible_branches = models.ManyToManyField(Branch, blank=True)
     interview_date = models.DateField()
-    application_deadline = models.DateField()
+    application_deadline = models.DateTimeField()
     openings = models.IntegerField(default=1)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     created_at = models.DateTimeField(auto_now_add=True)

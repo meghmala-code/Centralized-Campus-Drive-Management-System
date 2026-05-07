@@ -12,106 +12,152 @@
             --han-purple: #5212ec;
             --ruby: #e0115f;
         }
-        .login-container { 
-            height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: #f0f2f5; 
-            position: relative; /* Required for the back button */
-        }
-        .login-card { 
-            width: 100%; 
-            max-width: 400px; 
-            padding: 30px; 
-            border-radius: 15px; 
+        
+        /* Replace your old .login-container with this */
+.login-container { 
+    min-height: 100vh; 
+    display: flex; 
+    align-items: center; 
+    position: relative;
+    overflow: hidden;
+    
+    /* The base color (Soft light gray/white) */
+    background-color: #fcfcfc;
+    
+    /* The Aurora Glowing Orbs using your brand colors */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(82, 18, 236, 0.12) 0px, transparent 50%),   /* Top Left: Han Purple */
+        radial-gradient(at 100% 100%, rgba(224, 17, 95, 0.12) 0px, transparent 50%), /* Bottom Right: Ruby */
+        radial-gradient(at 100% 0%, rgba(255, 204, 0, 0.15) 0px, transparent 50%);   /* Top Right: Yellow */
+}
+
+/* Make sure your Back button is dark again so you can read it on the light background! */
+.back-to-home { 
+    position: absolute; 
+    top: 20px; 
+    left: 25px; 
+    color: #6c757d; /* Changed back to dark grey */
+    text-decoration: none; 
+    font-weight: 600; 
+    font-size: 14px;
+    transition: 0.3s ease; 
+    z-index: 10;
+}
+
+.back-to-home:hover { 
+    color: var(--han-purple); 
+}
+        
+        .split-card {
+            border-radius: 20px;
+            overflow: hidden;
             border: none;
+            background: #ffffff;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important; /* Stronger shadow */
         }
-        /* Styling for the Back to Home link */
-        .back-to-home { 
-            position: absolute; 
-            top: 20px; 
-            left: 25px; 
-            color: #6c757d; 
-            text-decoration: none; 
-            font-weight: 600; 
-            font-size: 14px;
-            transition: 0.3s ease; 
+        
+        .image-side {
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
-        .back-to-home:hover { 
-            color: var(--han-purple); 
+        
+        .image-side img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            object-fit: contain;
+        }
+        
+        .form-side {
+            padding: 3.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-side {
+                padding: 2rem;
+            }
         }
     </style>
 </head>
+
+{% load static %}
 <body class="login-container">
 
     <a href="{% url 'home' %}" class="back-to-home">
         <i class="fas fa-arrow-left me-2"></i>Back to Home
     </a>
 
-    <div class="card login-card shadow-lg">
-        <div class="text-center mb-4">
-            <h3 class="fw-bold" style="color: var(--han-purple);">CareerFlow</h3>
-            <p class="text-muted">Enter your credentials to continue</p>
-        </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="card split-card">
+                    <div class="row g-0">
+                        
+                        <div class="col-md-6 d-none d-md-flex image-side">
+                            <img src="{% static 'images/login-art.jpg' %}" alt="Login Illustration">
+                        </div>
 
-        {% if messages %}
-    {% for message in messages %}
-        <!-- ONLY show error messages on this specific page -->
-        {% if message.tags == 'error' %}
-            <div class="alert alert-danger py-2 small mb-3">
-                <i class="fas fa-exclamation-circle me-1"></i> {{ message }}
-            </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
+                        <div class="col-md-6 form-side">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold" style="color: var(--han-purple);">CareerFlow</h3>
+                                <p class="text-muted">Enter your credentials to continue</p>
+                            </div>
 
-        <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} py-2 small mb-3 text-center border-0 shadow-sm">
+                                        <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-1"></i> {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
 
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger p-2 small text-center border-0 shadow-sm">
-                    <i class="fas fa-exclamation-circle me-1"></i> {{ form.non_field_errors.0 }}
-                </div>
-            {% endif %}
+                            <form method="POST" action="{% url 'login' %}">
+                                {% csrf_token %}
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} p-2 small text-center border-0 shadow-sm">
-                        {{ message }}
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-danger p-2 small text-center border-0 shadow-sm">
+                                        <i class="fas fa-exclamation-circle me-1"></i> {{ form.non_field_errors.0 }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold text-uppercase">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                                        <input type="text" name="username" class="form-control border-start-0 ps-0" required placeholder="Enter your username">
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-bold text-uppercase">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                                        <input type="password" name="password" class="form-control border-start-0 ps-0" required placeholder="Enter your password">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn w-100 text-white fw-bold py-2 mb-4 shadow-sm" style="background-color: var(--han-purple); border-radius: 8px;">
+                                    <i class="fas fa-sign-in-alt me-2"></i> Login Securely
+                                </button>
+
+                                <div class="text-center mt-2 border-top pt-3">
+                                    <p class="text-muted small fw-medium mb-1">
+                                        New student? <a href="{% url 'register_student' %}" class="text-decoration-none fw-bold" style="color: var(--han-purple);">Register here</a>
+                                    </p>
+                                    <p class="text-muted small fw-medium mb-0">
+                                        Are you a recruiter? <a href="{% url 'register_hr' %}" class="text-decoration-none fw-bold" style="color: var(--ruby);">Partner with us</a>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                        
                     </div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="mb-3">
-                <label class="form-label text-muted small fw-bold text-uppercase">Username</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
-                    <input type="text" name="username" class="form-control border-start-0 ps-0" required placeholder="Enter your username">
                 </div>
             </div>
-
-            <div class="mb-4">
-                <label class="form-label text-muted small fw-bold text-uppercase">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
-                    <input type="password" name="password" class="form-control border-start-0 ps-0" required placeholder="Enter your password">
-                </div>
-            </div>
-
-            <button type="submit" class="btn w-100 text-white fw-bold py-2 mb-4 shadow-sm" style="background-color: var(--han-purple); border-radius: 8px;">
-                <i class="fas fa-sign-in-alt me-2"></i> Login Securely
-            </button>
-
-            <div class="text-center mt-2 border-top pt-3">
-                <p class="text-muted small fw-medium mb-1">
-                    New student? <a href="{% url 'register_student' %}" class="text-decoration-none fw-bold" style="color: var(--han-purple);">Register here</a>
-                </p>
-                <p class="text-muted small fw-medium mb-0">
-                    Are you a recruiter? <a href="{% url 'register_hr' %}" class="text-decoration-none fw-bold" style="color: var(--ruby);">Partner with us</a>
-                </p>
-            </div>
-        </form>
+        </div>
     </div>
 
 </body>
