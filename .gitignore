@@ -3,3 +3,9 @@ __pycache__/
 *.pyc
 db.sqlite3
 .env
+
+# Static files collected by Django
+staticfiles/
+
+# Mac OS hidden files
+.DS_Store

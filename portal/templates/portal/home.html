@@ -139,12 +139,17 @@
         
         /* Subtle floating animation for doodles and accents */
         .float-anim {
-            animation: float 6s ease-in-out infinite;
-        }
+    animation: floating 6s ease-in-out infinite;
+}
 
-        /* Add slight delays so they don't all float up and down at the exact same time */
-        .delay-1 { animation-delay: 1s; }
-        .delay-2 { animation-delay: 2s; }
+/* 2. Create the delays so they float at different times */
+.delay-1 { animation-delay: 1s; }
+.delay-2 { animation-delay: 2s; }
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); } /* Moves up 15 pixels */
+    100% { transform: translateY(0px); }  /* Floats back down */
+}
 
         
     </style>
