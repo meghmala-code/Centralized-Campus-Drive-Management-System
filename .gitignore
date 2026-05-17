@@ -9,3 +9,6 @@ staticfiles/
 
 # Mac OS hidden files
 .DS_Store
+
+resumes/
+media/resumes/
